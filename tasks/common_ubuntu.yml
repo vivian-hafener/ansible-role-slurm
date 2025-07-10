@@ -10,13 +10,13 @@
     register: reg_slurm_unixuser
     when: slurm_user_uid is defined
 
-  - name: install common Slurm packages
-    apt: name="{{ slurm_packages }}" state=present update_cache=yes allow_unauthenticated=yes
-    when: slurm_packages.0 != ""
+  # - name: install common Slurm packages
+  #   apt: name="{{ slurm_packages }}" state=present update_cache=yes allow_unauthenticated=yes
+  #   when: slurm_packages.0 != ""
 
-  - name: install fgci Slurm addons
-    package: name=slurm-fgi-addons state=present
-    when: slurm_repo == 'fgci'
+  # - name: install fgci Slurm addons
+  #   package: name=slurm-fgi-addons state=present
+  #   when: slurm_repo == 'fgci'
 
   - name: Copy pam.d/slurm
     copy: src=pam_slurm dest=/etc/pam.d/slurm owner=root mode=0644
@@ -59,6 +59,6 @@
     template: src=x11.conf.j2 dest=/etc/slurm/plugstack.conf.d/x11.conf owner=root mode=0644 backup=no
     when: slurm_plugstack|bool and slurm_x11_spank|bool
 
-  - name: install slurm-spank-x11 and xauth
-    package: name="{{ slurm_spank_x11_packages }}" state=present
-    when: slurm_plugstack|bool and slurm_x11_spank|bool
+  # - name: install slurm-spank-x11 and xauth
+  #   package: name="{{ slurm_spank_x11_packages }}" state=present
+  #   when: slurm_plugstack|bool and slurm_x11_spank|bool

@@ -14,14 +14,18 @@
   # check which version of slurm is installed
 - include_tasks: version.yml
 
-- include_vars: slurm_ohpc.yml
-  when: slurm_repo == 'ohpc'
+  # Create the slurm user and group
+- include_tasks: user.yml
+
+
+  # Install Slurm from staging
+- include_tasks: install.yml
 
   # common.yml is applied to all nodes
     # configure pam
     # template in cgroup.conf, gres.conf and slurm.conf
     # set up logrotate and rsyslog
-- include_tasks: common.yml
+- include_tasks: configure.yml
 
 
   # upgrade is used to compare slurm version installed and the one ansible wants to install
@@ -67,12 +71,12 @@
 - include_tasks: submit.yml
   when: "(ansible_os_family == 'RedHat') and ('slurm_compute' not in group_names) and ('slurm_service' not in group_names)"
 
-- name: Versionlock slurm packages when using OHPC
-  command: yum versionlock add {{ item }}
-  when: slurm_repo == 'ohpc' and slurm_ohpc_versionlock == True
-  loop: "{{ slurm_ohpc_versionlock_list }}"
+# - name: Versionlock slurm packages when using OHPC
+#   command: yum versionlock add {{ item }}
+#   when: slurm_repo == 'ohpc' and slurm_ohpc_versionlock == True
+#   loop: "{{ slurm_ohpc_versionlock_list }}"
 
-- name: Remove slurm versionlock for OHPC upgrade
-  command: yum versionlock delete {{ item }}
-  when: slurm_repo == 'ohpc' and slurm_ohpc_versionlock == False
-  loop: "{{ slurm_ohcp_versionlock_list }}"
+# - name: Remove slurm versionlock for OHPC upgrade
+#   command: yum versionlock delete {{ item }}
+#   when: slurm_repo == 'ohpc' and slurm_ohpc_versionlock == False
+#   loop: "{{ slurm_ohcp_versionlock_list }}"

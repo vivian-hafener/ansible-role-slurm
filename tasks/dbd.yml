@@ -4,16 +4,16 @@
       that: "slurm_mysql_password is defined"
 
 ####
+# TODO Install
+  # - name: install slurmdbd specific packages for fgci repo
+  #   package: name="{{ slurmdbd_packages_fgci_repo }}" state=present
+  #   register: reg_install_slurm_packages
+  #   when: ansible_os_family == "RedHat" and slurm_repo == "fgci"
 
-  - name: install slurmdbd specific packages for fgci repo
-    package: name="{{ slurmdbd_packages_fgci_repo }}" state=present
-    register: reg_install_slurm_packages
-    when: ansible_os_family == "RedHat" and slurm_repo == "fgci"
-
-  - name: install slurmdbd specific packages for ohpc repo
-    package: name="{{ slurmdbd_packages_ohpc_repo }}" state=present
-    register: reg_install_slurm_packages
-    when: ansible_os_family == "RedHat" and slurm_repo == "ohpc"
+  # - name: install slurmdbd specific packages for ohpc repo
+  #   package: name="{{ slurmdbd_packages_ohpc_repo }}" state=present
+  #   register: reg_install_slurm_packages
+  #   when: ansible_os_family == "RedHat" and slurm_repo == "ohpc"
 
   - name: start and enable mariadb/mysql
     service: name={{ slurm_sql_service }} state=started enabled=yes
