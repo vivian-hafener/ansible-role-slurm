@@ -1,14 +1,36 @@
 ---
-# Copy local staging/bin into remote /bin
+# Copy local staging/bin into remote /usr/bin
   - name: copy bin
     ansible.builtin.copy:
       src: "{{ slurm_staging_dir }}/bin"
-      dest: /bin
+      dest: /usr/bin
       owner: root
       group: root
       mode: 755
       
-# Copy local staging/sbin
+# Copy local staging/sbin into remote /usr/local/sbin
   - name: copy sbin
     ansible.builtin.copy:
-      src: "{{ slurm_staging_dir }}/bin"
+      src: "{{ slurm_staging_dir }}/sbin"
+      dest: /usr/local/sbin
+      owner: root
+      group: root
+      mode: 755
+
+# Copy local lib into remote /usr/lib
+  - name: copy lib
+    ansible.builtin.copy:
+      src: "{{ slurm_staging_dir }}/lib"
+      dest: /usr/lib
+      owner: root
+      group: root
+      mode: 755
+
+# Copy local man into remote /usr/share/man
+  - name: copy man
+    ansible.builtin.copy:
+      src: "{{ slurm_staging_dir }}/share/man"
+      dest: /usr/share/man
+      owner: root
+      group: root
+      mode: 755

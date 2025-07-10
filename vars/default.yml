@@ -2,3 +2,5 @@
 slurm_staging_dir: "/home/vhafener/slurm/staging"
 slurmd_service: "slurmd.service"
 slurmctld_service: "slurmctld.service"
+slurm_sql_service: "mariadb"
+slurm_plugstack: false

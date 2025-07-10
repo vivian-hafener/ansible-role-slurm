@@ -1,5 +1,5 @@
 ---
-# TODO Install
+  # TODO Install
   # - name: install slurm service specific packages
   #   package: name="{{ slurm_service_packages }}" state=present
 
@@ -28,15 +28,7 @@
     copy: src=files/munge.key dest={{ slurm_munge_key_nfs }} mode=0400 owner=munge group=munge
     when: slurm_munge_key_to_nfs|bool
 
-  - name: add slurm unix group
-    group: name=slurm system=no state=present
-    register: reg_slurm_unixgroup
-    when: slurm_user_uid is not defined
-
-  - name: add slurm unix user
-    user: name=slurm shell=/sbin/nologin createhome=no system=no append=yes group=slurm state=present
-    register: reg_slurm_unixuser
-    when: slurm_user_uid is not defined
+  - include_tasks: user.yml
 
   - name: add slurm log dir
     file: "path={{ slurm_log_dir }} state=directory owner=slurm group=slurm mode=0750"

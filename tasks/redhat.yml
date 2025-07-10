@@ -17,7 +17,6 @@
   # Create the slurm user and group
 - include_tasks: user.yml
 
-
   # Install Slurm from staging
 - include_tasks: install.yml
 
