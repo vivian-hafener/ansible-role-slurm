@@ -1,6 +1,7 @@
 ---
 # Copy local staging/bin into remote /usr/bin
   - name: copy bin
+    become: true
     ansible.builtin.copy:
       src: "{{ slurm_staging_dir }}/bin"
       dest: /usr/bin
@@ -10,6 +11,7 @@
       
 # Copy local staging/sbin into remote /usr/local/sbin
   - name: copy sbin
+    become: true
     ansible.builtin.copy:
       src: "{{ slurm_staging_dir }}/sbin"
       dest: /usr/local/sbin
@@ -19,6 +21,7 @@
 
 # Copy local lib into remote /usr/lib
   - name: copy lib
+    become: true
     ansible.builtin.copy:
       src: "{{ slurm_staging_dir }}/lib"
       dest: /usr/lib
@@ -28,6 +31,7 @@
 
 # Copy local man into remote /usr/share/man
   - name: copy man
+    become: true
     ansible.builtin.copy:
       src: "{{ slurm_staging_dir }}/share/man"
       dest: /usr/share/man
