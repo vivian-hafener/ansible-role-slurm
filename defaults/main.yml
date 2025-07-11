@@ -69,7 +69,7 @@ slurm_switch_type: "switch/none"
 slurm_mpi_default: "none"
 slurm_mpi_params: "ports=12000-12999"
 slurm_proctrack_type: "proctrack/cgroup"
-slurm_service_node: "svc.vhafener.com"
+slurm_service_node: "n1.vhafener.com"
 
 #slurm_control_addr is the same as ControlMachine ( slurm_service_node ) by default. 
 #Define it here to change it.
