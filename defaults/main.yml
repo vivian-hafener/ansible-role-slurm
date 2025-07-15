@@ -78,6 +78,7 @@ slurm_service_node: "n1.vhafener.com"
 #slurm_backup_controller: "{{ groups['slurm_service'][1] }}"
 # The addr of the backup controller, if necessary
 #slurm_backup_addr: "foo.example.com"
+slurm_controller_host: "{{ slurm_service_node }}"
 
 slurm_accounting_storage_host: "{{ slurm_service_node }}"
 slurm_accounting_storage_type: "accounting_storage/slurmdbd"
