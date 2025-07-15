@@ -6,7 +6,6 @@
           owner=munge
           group=munge
           mode=0400
-          follow=true
     notify:
      - restart munge
           

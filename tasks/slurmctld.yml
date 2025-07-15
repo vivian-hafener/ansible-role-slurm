@@ -5,7 +5,7 @@
 
   - name: Install munge key for slurmctld
     copy:
-      src=files/munge.key
+      src="{{ munge_key_path }}"
       dest=/etc/munge/munge.key
       owner=munge
       group=munge
