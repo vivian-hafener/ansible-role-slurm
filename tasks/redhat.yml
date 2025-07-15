@@ -19,6 +19,7 @@
 
   # Install Slurm from staging
 - include_tasks: install.yml
+  when: "'update-slurm' in ansible_run_tags"
 
   # common.yml is applied to all nodes
     # configure pam
