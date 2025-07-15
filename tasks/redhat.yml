@@ -64,12 +64,12 @@
     # get munge.key from the directory where you run ansible or NFS
     # create namespace epilog script
 - include_tasks: compute.yml
-  when: "'slurm_compute' in group_names and ansible_os_family == 'RedHat'"
+  when: "'slurm_compute' in group_names"
 
   # submit (not on compute or service nodes)
     # get munge.key from the directory where you run ansible
 - include_tasks: submit.yml
-  when: "(ansible_os_family == 'RedHat') and ('slurm_compute' not in group_names) and ('slurm_service' not in group_names)"
+  when: "'slurm_compute' not in group_names"
 
 # - name: Versionlock slurm packages when using OHPC
 #   command: yum versionlock add {{ item }}
