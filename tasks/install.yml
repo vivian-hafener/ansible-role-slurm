@@ -1,4 +1,5 @@
 ---
+# TODO These take a while and I should first try to check whether slurm is already installed
 # Copy local staging/bin into remote /usr/bin
   - name: copy bin
     become: true

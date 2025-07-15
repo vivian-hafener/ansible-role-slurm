@@ -21,7 +21,7 @@
 
   - name: restart mariadb/mysql after install
     service: name={{ slurm_sql_service }} state=restarted
-    when: reg_install_slurm_packages.changed
+    # when: reg_install_slurm_packages.changed
 
   - name: wait for mysql in port 3306 to start
     wait_for: port=3306 delay=10 timeout=60
