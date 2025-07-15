@@ -1,7 +1,7 @@
 ---
 
   - name: copy munge key to submit node
-    copy: src=/etc/munge/munge.key
+    copy: src="{{ munge_key_path }}"
           dest=/etc/munge/munge.key
           owner=munge
           group=munge
