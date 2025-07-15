@@ -54,11 +54,10 @@
     # start and enable slurmdbd wherever that runs (after we ensure there's a slurm user/group)
     # sacctmgr create cluster
 - include_tasks: service.yml
-  when: slurm_service_node == inventory_hostname
-
+  when: slurm_role == "controller"
   # slurmctld hosts, primary and potentially backup
 - include_tasks: slurmctld.yml
-  when: slurm_service_node == inventory_hostname or (slurm_backup_controller is defined and slurm_backup_controller == inventory_hostname)
+  when: slurm_role == "controller" or (slurm_backup_controller is defined and slurm_backup_controller == inventory_hostname)
 
   # computes
     # get munge.key from the directory where you run ansible or NFS

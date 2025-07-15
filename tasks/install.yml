@@ -1,5 +1,7 @@
 ---
 # TODO These take a while and I should first try to check whether slurm is already installed
+# TODO Template out the systemd service files
+
 # Copy local staging/bin into remote /usr/bin
   - name: copy bin
     become: true
