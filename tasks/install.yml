@@ -11,6 +11,7 @@
       owner: root
       group: root
       mode: 755
+      directory_mode: 755
       
 # Copy local staging/sbin into remote /usr/local/sbin
   - name: copy sbin
@@ -21,6 +22,7 @@
       owner: root
       group: root
       mode: 755
+      directory_mode: 755
 
 # Copy local lib into remote /usr/lib
   - name: copy lib
@@ -31,6 +33,7 @@
       owner: root
       group: root
       mode: 755
+      directory_mode: 755
 
 # Copy local man into remote /usr/share/man
   - name: copy man
@@ -41,3 +44,4 @@
       owner: root
       group: root
       mode: 755
+      directory_mode: 755
