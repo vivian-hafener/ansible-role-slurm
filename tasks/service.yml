@@ -10,7 +10,7 @@
     ignore_errors: True
 
   - name: create munge key
-    command: /usr/sbin/create-munge-key creates=/etc/munge/munge.key
+    command: /usr/sbin/mungekey creates=/etc/munge/munge.key
     register: mungekeygen
     when: mungekeystat is defined and mungekeystat.stat.exists == False
 
