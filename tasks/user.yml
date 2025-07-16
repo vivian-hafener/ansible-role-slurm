@@ -6,7 +6,6 @@
       state: present
       system: no
     register: reg_slurm_unixgroup
-    when: slurm_user_uid is defined
 
   - name: add slurm unix user
     ansible.builtin.user:
@@ -18,4 +17,3 @@
       group: slurm
       state: present
     register: reg_slurm_unixuser
-    when: slurm_user_uid is defined
