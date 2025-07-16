@@ -13,7 +13,6 @@
       shell: /sbin/nologin
       create_home: no
       system: no
-      append: yes
-      group: slurm
+      groups: slurm
       state: present
     register: reg_slurm_unixuser
