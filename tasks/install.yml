@@ -6,7 +6,7 @@
   - name: copy bin
     become: true
     ansible.builtin.copy:
-      src: "{{ slurm_staging_dir }}/bin"
+      src: "{{ slurm_staging_dir }}/bin/"
       dest: /usr/bin
       owner: root
       group: root
@@ -16,7 +16,7 @@
   - name: copy sbin
     become: true
     ansible.builtin.copy:
-      src: "{{ slurm_staging_dir }}/sbin"
+      src: "{{ slurm_staging_dir }}/sbin/"
       dest: /usr/local/sbin
       owner: root
       group: root
@@ -26,7 +26,7 @@
   - name: copy lib
     become: true
     ansible.builtin.copy:
-      src: "{{ slurm_staging_dir }}/lib"
+      src: "{{ slurm_staging_dir }}/lib/"
       dest: /usr/lib
       owner: root
       group: root
@@ -36,7 +36,7 @@
   - name: copy man
     become: true
     ansible.builtin.copy:
-      src: "{{ slurm_staging_dir }}/share/man"
+      src: "{{ slurm_staging_dir }}/share/man/"
       dest: /usr/share/man
       owner: root
       group: root
