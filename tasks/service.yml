@@ -70,9 +70,4 @@
     # slurmdbd needs to be started after the slurm unix user is created
   - name: start and enable slurmdbd on slurm_accounting_storage_host
     service: name=slurmdbd state=started enabled=yes
-    delegate_to: "{{ slurm_accounting_storage_host }}"
-    when: slurm_accounting_storage_host != inventory_hostname
-
-  - name: start and enable slurmdbd
-    service: name=slurmdbd state=started enabled=yes
     when: slurm_accounting_storage_host == inventory_hostname
