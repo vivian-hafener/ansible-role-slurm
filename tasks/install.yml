@@ -7,7 +7,7 @@
     become: true
     ansible.builtin.copy:
       src: "{{ slurm_staging_dir }}/bin/"
-      dest: /usr/bin
+      dest: "{{ slurm_bin_dir }}"
       owner: root
       group: root
       mode: 755
@@ -18,7 +18,7 @@
     become: true
     ansible.builtin.copy:
       src: "{{ slurm_staging_dir }}/sbin/"
-      dest: /usr/local/sbin
+      dest: "{{ slurm_sbin_dir}}"
       owner: root
       group: root
       mode: 755
@@ -29,7 +29,7 @@
     become: true
     ansible.builtin.copy:
       src: "{{ slurm_staging_dir }}/lib/"
-      dest: /usr/lib
+      dest: "{{ slurm_lib_dir }}"
       owner: root
       group: root
       mode: 755
@@ -40,7 +40,7 @@
     become: true
     ansible.builtin.copy:
       src: "{{ slurm_staging_dir }}/share/man/"
-      dest: /usr/share/man
+      dest: "{{ slurm_man_dir }}"
       owner: root
       group: root
       mode: 755

@@ -50,3 +50,33 @@
       path: /etc/slurm/plugstack.conf.d/x11.conf
       state: absent
     when: slurm_plugstack|bool == false or slurm_x11_spank|bool == false
+
+  - name: template in slurmd.service file
+    ansible.builtin.template:
+      src: slurmd.service
+      dest: /etc/systemd/system/slurmd.service
+      owner: root
+      mode: 0644
+
+  - name: template in slurmctld.service file
+    ansible.builtin.template:
+      src: slurmctld.service
+      dest: /etc/systemd/system/slurmctld.service
+      owner: root
+      mode: 0644
+    when: (slurm_controller_host == inventory_hostname)
+  
+  - name: template in slurmdbd.service file
+    ansible.builtin.template:
+      src: slurmdbd.service
+      dest: /etc/systemd/system/slurmdbd.service
+      owner: root
+      mode: 0644
+    when: (slurm_controller_host == inventory_hostname)
+
+  # - name: template in sackd.service file
+  #   ansible.builtin.template:
+  #     src: sackd.service
+  #     dest: /etc/systemd/system/sackd.service
+  #     owner: root
+  #     mode: 0644
