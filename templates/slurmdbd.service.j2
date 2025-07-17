@@ -16,6 +16,7 @@ RuntimeDirectoryMode=0755
 ExecStart={{ slurm_sbin_dir }}/slurmdbd -D -s $SLURMDBD_OPTIONS
 ExecReload=/bin/kill -HUP $MAINPID
 LimitNOFILE=65536
+Environment=LD_LIBRARY_PATH={{ slurm_lib_dir }}
 
 # Uncomment the following lines to disable logging through journald.
 # NOTE: It may be preferable to set these through an override file instead.

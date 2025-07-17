@@ -18,6 +18,7 @@ LimitNOFILE=131072
 LimitMEMLOCK=infinity
 LimitSTACK=infinity
 Delegate=yes
+Environment=LD_LIBRARY_PATH={{ slurm_lib_dir }}
 
 # Uncomment the following lines to disable logging through journald.
 # NOTE: It may be preferable to set these through an override file instead.
