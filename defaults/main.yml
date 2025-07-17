@@ -139,7 +139,7 @@ slurm_KeepAliveTime: "60"
 slurm_OverTimeLimit: "60"
 
 ##
-slurm_first_job_id: "2230000"
+slurm_first_job_id: "1"
 slurm_return_to_service: "1"
 slurm_max_job_count: "30000"
 slurm_max_job_time: "7-00:00:00"
