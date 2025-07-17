@@ -53,14 +53,14 @@
 
   - name: template in slurmd.service file
     ansible.builtin.template:
-      src: slurmd.service
+      src: "slurmd.service.j2"
       dest: /etc/systemd/system/slurmd.service
       owner: root
       mode: 0644
 
   - name: template in slurmctld.service file
     ansible.builtin.template:
-      src: slurmctld.service
+      src: "slurmctld.service.j2"
       dest: /etc/systemd/system/slurmctld.service
       owner: root
       mode: 0644
@@ -68,7 +68,7 @@
   
   - name: template in slurmdbd.service file
     ansible.builtin.template:
-      src: slurmdbd.service
+      src: "slurmdbd.service.j2"
       dest: /etc/systemd/system/slurmdbd.service
       owner: root
       mode: 0644
@@ -76,7 +76,7 @@
 
   # - name: template in sackd.service file
   #   ansible.builtin.template:
-  #     src: sackd.service
+  #     src: sackd.service.j2
   #     dest: /etc/systemd/system/sackd.service
   #     owner: root
   #     mode: 0644
