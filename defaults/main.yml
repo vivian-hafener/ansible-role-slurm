@@ -224,10 +224,10 @@ slurm_sysctl_tcp_max_syn_backlog: "4096" # 512 is the default in el7
 # - "PartitionName=grid Nodes=gpu[1-1234] Default=NO MaxTime={{ slurm_max_job_time }} State=UP DefaultTime=2:00:00"
 
 # To add extra parameters, uncomment the following line and the desired parameter's lines. Add any other absent but needed parameter to the list slurm_ExtraParamsList. Entries in the list needs to be in Setting=value like below.
-#slurm_ExtraParamsList:
+slurm_ExtraParamsList:
 # - JobCredentialPrivateKey=""
 # - JobCredentialPublicCertificate=""
-# - PluginDir=""
+- PluginDir="{{ slurm_lib_dir }}/slurm"
 # - PlugStackConfig=""
 # - PropagatePrioProcess=""
 # - PropagateResourceLimits=""
