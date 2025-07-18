@@ -47,6 +47,13 @@
     service: name=munge state=restarted
     when: mungekeygen.changed and mungekeygen is defined
 
+  - name: set mungekey permissions 
+    ansible.builtin.file:
+      path: /etc/munge/munge.key
+      owner: munge
+      group: munge
+      mode: "0600"
+
   - name: start and enable munge on service nodes
     service: name=munge state=started enabled=yes
 
