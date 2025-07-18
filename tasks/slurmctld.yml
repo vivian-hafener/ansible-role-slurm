@@ -14,6 +14,7 @@
 
   - name: start and enable munge on slurmctlds
     service: name=munge state=started enabled=yes
+    when: (slurm_controller_host == inventory_hostname)
 
   - name: Increase net.core.somaxconn for slurmctld
     sysctl: name=net.core.somaxconn

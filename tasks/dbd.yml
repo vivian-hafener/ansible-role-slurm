@@ -75,7 +75,7 @@
      state: present 
      password: "{{ slurm_mysql_password }}"
     register: mysqlslurmuser
-    ignore_errors: yes
+    ignore_errors: true
     tags: debug
 
   - name: print mysqlslurmuser
