@@ -57,8 +57,6 @@
 
   # slurmctld hosts, primary and potentially backup
 - include_tasks: slurmctld.yml
-  when: (slurm_controller_host == inventory_hostname)
-  debugger: always
 
   # computes
     # get munge.key from the directory where you run ansible or NFS
