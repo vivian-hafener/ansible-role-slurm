@@ -13,6 +13,7 @@ slurm_sbin_dir: /usr/local/sbin
 slurm_lib_dir: /usr/lib
 slurm_man_dir: /usr/share/man
 slurm_sysconf_dir: /etc/slurm
+slurmctld_service: slurmctld.service
 
 # Overwrite DB_root_password in your vars file if you want to 
 # use a different password for root and slurm user
@@ -214,7 +215,7 @@ slurm_manage_sysctl: True
 slurm_sysctl_core_somaxconn: "4096" # 128 is the default in el7
 slurm_sysctl_tcp_max_syn_backlog: "4096" # 512 is the default in el7
 
-#slurm_nodelist:
+# slurm_nodelist:
 # - "NodeName=cn[1-1234] RealMemory=128000 Feature=haswell"
 # - "NodeName=gpu[1-1234] RealMemory=128000 Feature=haswell"
 
