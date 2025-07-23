@@ -1,0 +1,69 @@
+---
+
+- name: Slurm_mysql_password variable must be set
+  ansible.builtin.assert:
+    that: "slurm_mysql_password is defined"
+
+- name: Start and enable mariadb
+  ansible.builtin.systemd_service:
+    name: mariadb
+    state: started
+    enabled: true
+
+- name: Restart mariadb after install
+  ansible.builtin.systemd_service:
+    name: mariadb
+    state: restarted
+
+- name: Wait for mysql in port 3306 to start
+  ansible.builtin.wait_for:
+    port: 3306
+    delay: 10
+    timeout: 60
+
+- name: Set root sql user password
+  # If .my.cnf already exists, this will cause an mysql-root-password update.
+  # check_implicit_admin means it tries without password first
+  community.mysql.mysql_user:
+    name: root
+    password: "{{ DB_root_password }}"
+    check_implicit_admin: true
+  when: (slurm_manage_mariadb_security == true) and not ansible_check_mode
+
+- name: Template .my.cnf
+  ansible.builtin.template:
+    src: ".my.cnf.j2"
+    dest: "/root/.my.cnf"
+    owner: root
+    group: root
+    mode: 0600
+  when: slurm_manage_mysql_security == true
+
+- name: Delete anonymous sql server user for localhost
+  community.mysql.mysql_user: user="" state=absent
+  when: slurm_manage_mysql_security == true
+
+- name: Remove the mysql test database
+  community.mysql.mysql_db: db=test state=absent
+  when: slurm_manage_mysql_security == true
+
+- name: Create slurm acct db
+  community.mysql.mysql_db: name=slurm_acct_db state=present
+  when: slurm_manage_mysql_security == true
+
+- name: Create slurm sql user
+  community.mysql.mysql_user: 
+    name: slurm 
+    state: present 
+    password: "{{ slurm_mysql_password }}"
+  register: mysqlslurmuser
+  ignore_errors: true
+
+- name: Ensure slurm sql user has a password and privileges
+  community.mysql.mysql_user: 
+    name: slurm
+    password: "{{ slurm_mysql_password }}"
+    priv: "slurm_acct_db.*:ALL"
+    state: present 
+    update_password: always
+  when: mysqlslurmuser is failed or mysqlslurmuser is changed

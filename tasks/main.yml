@@ -14,6 +14,7 @@
 
 - name: Set up mariadb
   ansible.builtin.include_tasks: mariadb.yml
+  when: slurmdbd_host == inventory_hostname
 
 - name: Set up slurmdbd
   ansible.builtin.include_tasks: slurmdbd.yml

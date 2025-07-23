@@ -35,13 +35,14 @@ maketags: false
 
 # ============ Configuration ============
 
-# Cluster Configuration
+# Cluster Information
 cluster_name: "aspen"
 cluster_domain: "vhafener.com"
 slurmctld_host: "n1.{{ cluster_domain }}"
 slurmdbd_host: "n1.{{ cluster_domain }}"
 slurm_log_dir: "/var/log/slurm"
 
+# Feature toggles
 slurm_with_pam: false
 slurm_with_gpu: false
 slurm_with_cgroups: true
@@ -51,3 +52,5 @@ slurm_with_topo: false
 slurm_with_rsyslog: false
 slurm_with_logrotate: true
 slurm_with_x11: false
+
+slurm_manage_mariadb_security: true
