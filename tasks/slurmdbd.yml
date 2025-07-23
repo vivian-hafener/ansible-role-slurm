@@ -1,0 +1,15 @@
+---
+
+- name: Template in slurmdbd.conf
+  template:
+    src: slurmdbd.conf.j2
+    dest: /etc/slurm/slurmdbd.conf
+    owner: slurm
+    mode: 0700
+    backup: yes
+  notify:
+    - restart slurmdbd
+
+- name: Start and enable slurmdbd on slurm_accounting_storage_host
+  service: name=slurmdbd state=started enabled=yes
+  when: slurm_accounting_storage_host == inventory_hostname

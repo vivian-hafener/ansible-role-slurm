@@ -1,17 +1,37 @@
 ---
 - name: Copy pam.d/slurm
   when: slurm_with_pam == true
-  ansible.builtin.copy: 
-    src: pam_slurm 
-    dest: /etc/pam.d/slurm 
-    owner: root 
+  ansible.builtin.copy:
+    src: pam_slurm
+    dest: /etc/pam.d/slurm
+    owner: root
     mode: '0644'
 
-- name: Make sure /etc/slurm/ exists
-  ansible.builtin.file:
-    path: "/etc/slurm"
-    state: directory
+  - name: Add slurm log dir
+    ansible.builtin.file:
+      path: "{{ slurm_log_dir }}"
+      state: directory
+      owner: slurm
+      group: slurm
+      mode: '0755'
 
+  - name: Add slurm state dir
+    ansible.builtin.file:
+      path: "{{ slurm_state_dir }}"
+      state: directory
+      owner: slurm
+      group: slurm
+      mode: '0750'
+
+  - name: Add slurm etc dir
+    ansible.builtin.file:
+      path: "{{ slurm_conf_dir }}"
+      state: directory
+      owner: root
+      group: root
+      mode: '0755'
+
+# TODO Remove all freeform from this file
 - name: Make from template cgroup.conf
   ansible.builtin.template: src=cgroup.conf.j2 dest=/etc/slurm/cgroup.conf owner=root mode=0644 backup=yes
   notify: restart slurm
@@ -28,80 +48,80 @@
   when: slurm_with_topo == true
 
 - name: Make from template slurm.conf
-  ansible.builtin.template: 
-    src: slurm.conf.j2 
+  ansible.builtin.template:
+    src: slurm.conf.j2
     dest: "{{ slurm_conf_dir }}/slurm.conf"
-    owner: root 
-    mode: 0644 
+    owner: root
+    mode: '0644'
     backup: yes
   notify: restart_slurm # TODO Implement
 
-- name: write all slurm logs handled by rsyslog to one file
-  ansible.builtin.template: 
-    src: slurm_rsyslog.conf 
-    dest: /etc/rsyslog.d/10_slurm_rsyslog.conf 
-    owner: root 
-    mode: 0644 
+- name: Write all slurm logs handled by rsyslog to one file
+  ansible.builtin.template:
+    src: slurm_rsyslog.conf
+    dest: /etc/rsyslog.d/10_slurm_rsyslog.conf
+    owner: root
+    mode: '0644'
     backup: yes
   notify: Restart rsyslog
   when: slurm_with_rsyslog
 
-- name: configure logrotate to rotate slurm_logs in slurm_log_dir
-  ansible.builtin.template: 
-    src: slurm_logrotate.j2 
-    dest: /etc/logrotate.d/slurm 
-    owner: root 
-    mode: 0644 
+- name: Configure logrotate
+  ansible.builtin.template:
+    src: slurm_logrotate.j2
+    dest: /etc/logrotate.d/slurm
+    owner: root
+    mode: '0644'
     backup: no
   when: (slurm_log_dir is defined) and (slurm_with_logrotate == true)
 
-- name: template in plugstack.conf
+- name: Template in plugstack.conf
   ansible.builtin.template: src=plugstack.conf.j2 dest=/etc/slurm/plugstack.conf owner=root mode=0644 backup=yes
   when: slurm_with_plugstack == true
 
-- name: create slurm/plugstack.conf.d
+- name: Create slurm/plugstack.conf.d
   ansible.builtin.file: path=/etc/slurm/plugstack.conf.d state=directory owner=root group=root mode=0755
   when: slurm_with_plugstack == true
 
-- name: template in plugstack.conf.d/x11.conf
+- name: Template in plugstack.conf.d/x11.conf
   ansible.builtin.template: src=x11.conf.j2 dest=/etc/slurm/plugstack.conf.d/x11.conf owner=root mode=0644 backup=no
   when: (slurm_with_plugstack == true) and (slurm_with_x11 == true)
 
-- name: remove plugstack.conf.d/x11.conf if it is not being used
+- name: Remove plugstack.conf.d/x11.conf if it is not being used
   ansible.builtin.file:
     path: /etc/slurm/plugstack.conf.d/x11.conf
     state: absent
   when: (slurm_with_plugstack == true) and (slurm_with_x11 == true)
 
-- name: template in slurmd.service file
+- name: Template in slurmd.service file
   ansible.builtin.template:
     src: "slurmd.service.j2"
     dest: /etc/systemd/system/slurmd.service
     owner: root
-    mode: 0644
+    mode: '0644'
 
-- name: template in slurmctld.service file
+- name: Template in slurmctld.service file
   ansible.builtin.template:
     src: "slurmctld.service.j2"
     dest: /etc/systemd/system/slurmctld.service
     owner: root
-    mode: 0644
+    mode: '0644'
   when: (slurmctld_host == inventory_hostname)
 
-- name: template in slurmdbd.service file
+- name: Template in slurmdbd.service file
   ansible.builtin.template:
     src: "slurmdbd.service.j2"
     dest: /etc/systemd/system/slurmdbd.service
     owner: root
-    mode: 0644
+    mode: '0644'
   when: (slurmctld_host == inventory_hostname)
 
-- name: template in sackd.service file
+- name: Template in sackd.service file
   ansible.builtin.template:
     src: sackd.service.j2
     dest: /etc/systemd/system/sackd.service
     owner: root
-    mode: 0644
+    mode: '0644'
   when: slurm_with_sackd == true
 
 - name: Reload systemd daemon
