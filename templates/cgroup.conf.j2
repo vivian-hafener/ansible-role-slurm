@@ -1,0 +1,26 @@
+###
+#
+# Slurm cgroup support configuration file
+#
+# See man slurm.conf and man cgroup.conf for further
+# information on cgroup configuration parameters
+#--
+# Templated by ansible, don't edit manually.
+#
+CgroupMountpoint={{ slurm_cgroup_mountpoint }}
+CgroupAutomount={{ slurm_cgroup_automount }}
+
+ConstrainCores={{ slurm_cgroup_constrain_cores }}
+{% if slurm_major_version|int < 21 %}
+TaskAffinity={{ slurm_cgroup_taskaffinity }}
+{% endif %}
+{% if slurm_cgroup_constrain_kmem_space is defined %}
+ConstrainKmemSpace={{ slurm_cgroup_constrain_kmem_space }}
+{% endif %}
+ConstrainRAMSpace={{ slurm_cgroup_constrain_ram }}
+ConstrainSwapSpace={{ slurm_cgroup_constrain_swap }}
+AllowedRAMSpace={{ slurm_cgroup_allowedramspace }}
+MinRAMSpace={{ slurm_cgroup_min_ram }}
+AllowedSwapSpace={{ slurm_cgroup_allowedswapspace }}
+ConstrainDevices={{ slurm_cgroup_constrain_devices }}
+
