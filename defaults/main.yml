@@ -27,3 +27,9 @@ make_script_src: "{{ make_script_path }}"
 
 # Maketags with ctags
 maketags: false
+
+# Slurm cluster Configuration
+cluster_name: "aspen"
+cluster_domain: "vhafener.com"
+slurmctld_host: "n1.{{ cluster_domain }}"
+slurmdbd_host: "n1.{{ cluster_domain }}"
