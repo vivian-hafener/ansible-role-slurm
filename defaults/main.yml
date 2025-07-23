@@ -1,11 +1,15 @@
 ---
+# System details
 user_homedir: "/home/vhafener"
 
-# Slurm Source Configuration
+
+# ============ Installation ============
+
+# Source Configuration
 slurm_repo: https://github.com/SchedMD/slurm
 slurm_version_tag: "slurm-25-05-1-1"
 
-# Slurm installation parameters
+# Installation parameters
 slurm_version: "25.05"
 slurm_src_target_dir: "{{ user_homedir }}/slurm/{{ slurm_version }}"
 slurm_src_dir: "{{ slurm_src_target_dir }}/slurm"
@@ -28,8 +32,22 @@ make_script_src: "{{ make_script_path }}"
 # Maketags with ctags
 maketags: false
 
-# Slurm cluster Configuration
+
+# ============ Configuration ============
+
+# Cluster Configuration
 cluster_name: "aspen"
 cluster_domain: "vhafener.com"
 slurmctld_host: "n1.{{ cluster_domain }}"
 slurmdbd_host: "n1.{{ cluster_domain }}"
+slurm_log_dir: "/var/log/slurm"
+
+slurm_with_pam: false
+slurm_with_gpu: false
+slurm_with_cgroups: true
+slurm_with_plugstack: false
+slurm_with_sackd: false
+slurm_with_topo: false
+slurm_with_rsyslog: false
+slurm_with_logrotate: true
+slurm_with_x11: false

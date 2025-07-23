@@ -1,5 +1,5 @@
 ---
-
+# TODO Implement build_on_controller and change these to build_on_nodes
 - name: Clone the Slurm repository to the target
   ansible.builtin.git:
     repo: "{{ slurm_repo }}"
