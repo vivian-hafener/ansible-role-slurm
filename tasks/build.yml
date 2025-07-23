@@ -1,0 +1,21 @@
+---
+
+- name: Clone the Slurm repository to the target
+  ansible.builtin.git:
+    repo: "{{ slurm_repo }}"
+    dest: "{{ slurm_src_target_dir }}"
+    version: "{{ slurm_version_tag}}"
+
+- name: Configure Slurm
+  ansible.builtin.shell: 
+    chdir: "{{ slurm_build_dir }}"
+    cmd: "{{ slurm_src_dir }}/configure {{ slurm_build_flags }}"
+
+- name: Install slurm with make.py
+  when: slurm_build_method == "make.py"
+  ansible.builtin.script:
+    chdir: "{{ slurm_build_dir }}"
+    cmd: "{{ make_script_path }}"
+
+# - name: Install slurm with make
+#   when: slurm_built_method == "make"

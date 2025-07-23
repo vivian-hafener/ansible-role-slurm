@@ -1,6 +1,6 @@
 ---
   - name: Add slurm unix group
-    ansible.builtin.group:                                                                               
+    ansible.builtin.group:
       name: slurm
       state: present
       system: no
