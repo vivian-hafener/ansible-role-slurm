@@ -1,0 +1,17 @@
+---
+
+# TODO If epilogue is defined, ensure it exists?
+- name: Template in cgroup_allowed_devices for slurm
+  ansible.builtin.template:
+    src: cgroup_allowed_devices_file.j2
+    dest: "{{ slurm_conf_dir }}/cgroup_allowed_devices_file.conf"
+    owner: "{{ slurm_conf_owner }}"
+    group: "{{ slurm_conf_group }}"
+    mode: "{{ slurm_conf_mode }}"
+  when: slurm_with_cgroups
+
+- name: Start and enable slurmd
+  ansible.builtin.systemd_service:
+    name: "slurmd.service"
+    state: started
+    enabled: true
