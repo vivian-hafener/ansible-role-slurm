@@ -1,0 +1,35 @@
+---
+- name: Increase net.core.somaxconn for slurmctld
+  ansible.posix.sysctl:
+    name: net.core.somaxconn
+    value: {{ slurm_sysctl_core_somaxconn }}
+    sysctl_file: /etc/sysctl.d/50-slurm.conf
+  when: slurm_manage_sysctl
+
+- name: Increase net.ipv4.tcp_max_syn_backlog for slurmctld
+  ansible.posix.sysctl:
+    name: net.ipv4.tcp_max_syn_backlog
+    value: "{{ slurm_sysctl_tcp_max_syn_backlog }}"
+    sysctl_file: /etc/sysctl.d/50-slurm.conf
+  when: slurm_manage_sysctl
+
+- name: Start and enable slurmctld
+  ansible.builtin.systemd_service: "{{ slurmctld_service }}"
+    state: started
+    enabled: true
+    # environment:
+    #     SLURM_CONF: "{{ slurm_conf_dir }}/slurm.conf"
+
+- name: Sacctmgr show cluster siteName and store in slurm_clusterlist variable
+  ansible.builtin.shell: "sacctmgr -n show cluster {{ siteName }}  |grep {{ siteName }} | sed -e 's/.* {{ siteName }} .*/FOUND/'"
+  register: slurm_clusterlist
+  check_mode: no
+  changed_when: False
+  environment:
+    LD_LIBRARY_PATH: "{{ slurm_lib_dir }}/slurm"
+
+- name: Sacctmgr add cluster to accounting if it is not added already
+  ansible.builtin.command: "sacctmgr -i add cluster {{ cluster_name }} "
+  when: (slurm_clusterlist.stdout.find("FOUND") == -1)
+  environment:
+    LD_LIBRARY_PATH: "{{ slurm_lib_dir }}/slurm"
