@@ -55,6 +55,9 @@ SchedulerType={{ slurm_sched_type }}
 SchedulerParameters={{ slurm_sched_params }}
 {% endif %}
 SelectType={{ slurm_select_type }}
+MCSPlugin=mcs/label
+MCSParameters=ondemand,ondemandselect
+# TODO Work above into parameters
 
 # Debugging
 SlurmctldDebug={{ slurmctld_debug }}
