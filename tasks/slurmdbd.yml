@@ -11,4 +11,4 @@
     name: slurmdbd
     state: started
     enabled: true
-  when: slurmdbd_place.changed and not slurmdbd_start.changed
+  when: (not slurmdbd_start.changed) and (slurmdbd_place.changed)

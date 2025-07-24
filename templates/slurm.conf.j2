@@ -65,10 +65,10 @@ DebugFlags={{ slurm_debug_flags }}
 
 # ACCOUNTING
 AccountingStorageType={{ slurm_accounting_storage_type }}
-AccountingStorageHost={{ slurm_dbd_host }}
+AccountingStorageHost={{ slurmdbd_host }}
 
 # TOPOLOGY
-{% if slurm_with_topo is defined %}
+{% if slurm_with_topo %}
 TopologyPlugin={{ slurm_topology_plugin }}
 {% else %}
 #TopologyPlugin=topology/tree
@@ -83,24 +83,5 @@ TopologyPlugin={{ slurm_topology_plugin }}
 {% endif %}
 
 # partitions
-{% if slurm_partitionlist is defined %}
-{% for partition in slurm_partitionlist %}
-{{ partition }}
-{% endfor %}
-{% else %}
 PartitionName=debug Nodes=ALL Default=YES MaxTime=INFINITE State=UP
-{% endif %}
 
-# Slurm Extra Parameters
-{% if slurm_ExtraParamsList is defined %}
-{% for slurm_Param in slurm_ExtraParamsList %}
-{{ slurm_Param }}
-{% endfor %}
-{% endif %}
-
-{% if slurm_conf_version_specific_params_list is defined %}
-# Slurm Version Specific Parameters
-{% for slurm_v_param in slurm_conf_version_specific_params_list %}
-{{ slurm_v_param }}
-{% endfor %}
-{% endif %}

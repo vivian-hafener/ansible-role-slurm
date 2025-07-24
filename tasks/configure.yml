@@ -1,5 +1,4 @@
 ---
-
 # Configure Directories
 - name: Copy pam.d/slurm
   when: slurm_with_pam
@@ -43,7 +42,7 @@
     group: "{{ slurm_conf_group }}"
     mode: "{{ slurm_conf_mode }}"
     backup: "{{ slurm_backup_conf }}"
-  notify: restart slurm
+  # notify: restart slurm
   when: slurm_with_cgroups
 
 - name: Make from template gres.conf
@@ -53,7 +52,7 @@
     owner: "{{ slurm_conf_owner }}"
     group: "{{ slurm_conf_group }}"
     mode: "{{ slurm_conf_mode }}"
-  notify: restart slurm
+  # notify: restart slurm
   when: slurm_with_gpu
 
 - name: Make from template topology.conf
@@ -63,7 +62,7 @@
     owner: "{{ slurm_conf_owner }}"
     group: "{{ slurm_conf_group }}"
     mode: "{{ slurm_conf_mode }}"
-  notify: restart slurm
+  # notify: restart slurm
   when: slurm_with_topo
 
 - name: Pull in Slurm.conf vars
@@ -77,7 +76,8 @@
     group: "{{ slurm_conf_group }}"
     mode: "{{ slurm_conf_mode }}"
     backup: "{{ slurm_backup_conf }}"
-  notify: restart_slurm # TODO Implement
+  # notify: restart_slurm # TODO Implement
+  register: slurm_conf_place
 
 - name: Pull in Slurm.conf vars
   ansible.builtin.include_vars: slurmdbd.conf.yml
@@ -89,7 +89,7 @@
     dest: "{{ slurm_conf_dir}}/slurmdbd.conf"
     owner: "{{ slurm_conf_owner }}"
     group: "{{ slurm_conf_group }}"
-    mode: '0700'
+    mode: '0600'
     backup: "{{ slurm_backup_conf }}"
   register: slurmdbd_place
   when: slurmdbd_host == inventory_hostname
@@ -102,7 +102,7 @@
     group: "{{ slurm_conf_group }}"
     mode: "{{ slurm_conf_mode }}"
     backup: "{{ slurm_backup_conf }}"
-  notify: Restart rsyslog
+  # notify: Restart rsyslog
   when: slurm_with_rsyslog
 
 - name: Configure logrotate

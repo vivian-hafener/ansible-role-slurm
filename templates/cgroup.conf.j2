@@ -8,8 +8,7 @@
 # Templated by ansible, don't edit manually.
 #
 CgroupMountpoint={{ slurm_cgroup_mountpoint }}
-CgroupAutomount={{ slurm_cgroup_automount }}
-
+CgroupPlugin=autodetect
 ConstrainCores={{ slurm_cgroup_constrain_cores }}
 {% if slurm_major_version|int < 21 %}
 TaskAffinity={{ slurm_cgroup_taskaffinity }}

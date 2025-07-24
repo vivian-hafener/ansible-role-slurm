@@ -2,10 +2,17 @@
 # System details
 user_homedir: "/home/vhafener"
 
+# Role task controls:
+configure_slurm_user: false
+build_slurm: false
+configure_slurm: true
+configure_slurm_mariadb: false
+configure_munge: false
+configure_slurmdbd: true
+configure_slurmctld: true
+configure_slurmd: true
 
 # ============ Installation ============
-install_slurm: true
-build_slurm: "{{ install_slurm }}"
 update_slurm: false # TODO Implement this in install.yaml, will need to handle stopping, starting, installing new tag.
 # This can probably be done with a bunch of registers
 
@@ -16,28 +23,70 @@ slurm_version_tag: "slurm-25-05-1-1"
 # Installation parameters
 slurm_version: "25.05"
 slurm_src_target_dir: "{{ user_homedir }}/slurm/{{ slurm_version }}"
-slurm_src_dir: "{{ slurm_src_target_dir }}/slurm"
+slurm_src_dir: "{{ slurm_src_target_dir }}"
 slurm_build_dir: "{{ slurm_src_target_dir }}/{{ inventory_hostname }}/build"
 
 # Slurm configure flags
 # Available options inclue --enable-developer or --enable-multiple-slurmd
 # For none, set to ""
-slurm_configure_flags: "--enable developer"
+slurm_configure_flags: "--enable-developer --sysconfdir={{ slurm_conf_dir }}"
 
 # Method by which to build slurm. Options are "make.py" or "make"
 slurm_build_method: "make.py"
 
 # Make script config
 place_make_script: true
-make_script_path: "{{ user_homedir }}/slurm/scripts/make.py"
+slurm_scripts_dir: "{{ user_homedir }}/slurm/scripts"
+make_script_path: "{{ slurm_scripts_dir }}/make.py"
 make_script_src: "{{ make_script_path }}"
 
 # Maketags with ctags
 maketags: false
 
+# Slurm build dependencies
+install_build_deps: false
+slurm_build_deps:
+  - "@development-tools"
+  # - https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+  - clang
+  - clang-analyzer
+  - expect
+  - gtk2-devel
+  - hdf5-devel
+  - http-parser-devel
+  - hwloc-devel
+  - json-c-devel
+  - libcurl-devel
+  - libjwt-devel
+  - libevent-devel
+  - libibmad-devel
+  - libibumad-devel
+  - OpenIPMI
+  - libssh2-devel
+  - libyaml-devel
+  - lua-devel
+  - lz4-devel
+  - man
+  - man2html
+  - mariadb
+  - mariadb-devel
+  - munge
+  - munge-devel
+  - ncurses-devel
+  - numactl-devel
+  - openssl-devel
+  - pam-devel
+  - perl-ExtUtils-MakeMaker
+  - perl-ExtUtils-ParseXS
+  - pmix-devel
+  - python3
+  - readline-devel
+  - rrdtool-devel
+  - vim
+  - which
+  - dbus-devel
 
 # ============ Configuration ============
-configure_slurm: true
 
 # Configuration file permissions and ownership
 slurm_user: slurm
@@ -77,8 +126,36 @@ munge_key_path: "/etc/munge/munge.key"
 # MariaDB
 slurm_manage_mariadb_security: true
 slurm_db_user: slurm
-slurm_mysql_password: "test"
-slurmdb_root_password: "test"
+slurm_mysql_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          66343266316261633135653839323461626630363938616161323763316234333135396161343235
+          6231643465656536646431313262333662376663363135630a316132363335633565633363643964
+          63333465666364366262646634333062663561363730373561646662356665356630643035356364
+          6631343266623935370a386133313264363562623433323863633765623536623335386537343539
+          6337
+slurmdb_root_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          66343266316261633135653839323461626630363938616161323763316234333135396161343235
+          6231643465656536646431313262333662376663363135630a316132363335633565633363643964
+          63333465666364366262646634333062663561363730373561646662356665356630643035356364
+          6631343266623935370a386133313264363562623433323863633765623536623335386537343539
+          6337
 
 # Systemctl Settings
 slurm_manage_sysctl: false
+
+# Cgroups
+slurm_cgroup_mountpoint: "/sys/fs/cgroup"
+slurm_cgroup_constrain_cores: "yes"
+slurm_cgroup_constrain_ram: "no"
+slurm_cgroup_allowedramspace: "100.1" # At which % of requested memory should the process get killed?
+slurm_cgroup_constrain_swap: "no"
+slurm_cgroup_taskaffinity: "no"
+slurm_cgroup_allowedswapspace: "120" # % of memory allocation that can be phys mem+swap
+slurm_cgroup_constrain_devices: "no"
+slurm_cgroup_min_ram: "500" # always allocate this much memory to each job
+
+# Logrotate
+slurm_logrotate_rotate_interval: "weekly"
+slurm_logrotate_rotate: "8"
+slurm_logrotate_signal: "-HUP"

@@ -1,0 +1,3 @@
+---
+
+slurmdbd_pid_file: "/var/run/slurmdbd.pid"

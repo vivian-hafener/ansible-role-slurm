@@ -20,7 +20,7 @@
 - name: Wait for mysql in port 3306 to start
   ansible.builtin.wait_for:
     port: 3306
-    delay: 10
+    delay: 5
     timeout: 60
 
 - name: Set root sql user password
@@ -39,25 +39,25 @@
     owner: root
     group: root
     mode: '0600'
-  when: slurm_manage_mysql_security
+  when: slurm_manage_mariadb_security
 
 - name: Delete anonymous sql server user for localhost
   community.mysql.mysql_user:
     user: ""
     state: absent
-  when: slurm_manage_mysql_security
+  when: slurm_manage_mariadb_security
 
 - name: Remove the mysql test database
   community.mysql.mysql_db:
     db: test
     state: absent
-  when: slurm_manage_mysql_security
+  when: slurm_manage_mariadb_security
 
 - name: Create slurm acct db
   community.mysql.mysql_db:
     name: slurm_acct_db
     state: present
-  when: slurm_manage_mysql_security
+  when: slurm_manage_mariadb_security
 
 - name: Create slurm sql user
   community.mysql.mysql_user:
@@ -69,7 +69,7 @@
 
 - name: Ensure slurm sql user has a password and privileges
   community.mysql.mysql_user:
-    name: "{{}}"
+    name: "{{ slurm_db_user }}"
     password: "{{ slurm_mysql_password }}"
     priv: "slurm_acct_db.*:ALL"
     state: present

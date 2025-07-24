@@ -1,15 +1,11 @@
 ---
-
 - name: Configure slurm user and group
   ansible.builtin.include_tasks: user.yml
+  when: configure_slurm_user
 
 - name: Build
   ansible.builtin.include_tasks: build.yml
   when: build_slurm
-
-- name: Install
-  ansible.builtin.include_tasks: install.yml
-  when: install_slurm
 
 - name: Configure
   ansible.builtin.include_tasks: configure.yml
@@ -17,19 +13,20 @@
 
 - name: Set up Mariadb
   ansible.builtin.include_tasks: mariadb.yml
-  when: slurmdbd_host == inventory_hostname
+  when: (slurmdbd_host == inventory_hostname) and configure_slurm_mariadb
 
 - name: Configure Munge
   ansible.builtin.include_tasks: munge.yml
+  when: configure_munge
 
 - name: Set up slurmdbd
   ansible.builtin.include_tasks: slurmdbd.yml
-  when: slurmdbd_host == inventory_hostname
+  when: (slurmdbd_host == inventory_hostname) and configure_slurmdbd
 
 - name: Set up slurmctld
   ansible.builtin.include_tasks: slurmctld.yml
-  when: slurmctld_host == inventory_hostname
+  when: (slurmctld_host == inventory_hostname) and configure_slurmctld
 
 - name: Set up slurmd's
   ansible.builtin.include_tasks: slurmd.yml
-  when: "'slurm_compute' in group_names"
+  when: (inventory_hostname in groups['slurm_compute']) and configure_slurmd

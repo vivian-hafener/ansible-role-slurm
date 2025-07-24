@@ -52,6 +52,3 @@ slurm_nodelist:
 # Partitions:
 # slurm_partitionlist:
 #   - "PartitionName=batch Nodes={{ slurm_compute_nodes }} Default=NO MaxTime=INFINITE State=UP DefaultTime=2:00:00"
-
-slurm_ExtraParamsList:
-  - PluginDir="{{ slurm_lib_dir }}/slurm"
