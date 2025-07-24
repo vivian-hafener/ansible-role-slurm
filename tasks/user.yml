@@ -1,15 +1,15 @@
 ---
-  - name: Add slurm unix group
-    ansible.builtin.group:
-      name: slurm
-      state: present
-      system: no
+- name: Add slurm unix group
+  ansible.builtin.group:
+    name: "{{ slurm_group }}"
+    state: present
+    system: false
 
-  - name: Add slurm unix user
-    ansible.builtin.user:
-      name: slurm
-      shell: /sbin/nologin
-      create_home: no
-      system: no
-      groups: slurm
-      state: present
+- name: Add slurm unix user
+  ansible.builtin.user:
+    name: "{{ slurm_user }}"
+    shell: /sbin/nologin
+    create_home: false
+    system: false
+    groups: "{{ slurm_group }}"
+    state: present
