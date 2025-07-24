@@ -1,0 +1,33 @@
+---
+- name: Template in plugstack.conf
+  ansible.builtin.template:
+    src: plugstack.conf.j2
+    dest: "{{ slurm_conf_dir }}/plugstack.conf"
+    owner: "{{ slurm_conf_owner }}"
+    group: "{{ slurm_conf_group }}"
+    mode: "{{ slurm_conf_mode }}"
+    backup: "{{ slurm_backup_conf }}"
+
+- name: Create slurm/plugstack.conf.d
+  ansible.builtin.file:
+    path: "{{ slurm_conf_dir }}/plugstack.conf.d"
+    state: directory
+    owner: "{{ slurm_conf_owner }}"
+    group: "{{ slurm_conf_group }}"
+    mode: '0755'
+
+- name: Template in plugstack.conf.d/x11.conf
+  ansible.builtin.template:
+    src: x11.conf.j2
+    dest: "{{ slurm_conf_dir }}/plugstack.conf.d/x11.conf"
+    owner: "{{ slurm_conf_owner }}"
+    group: "{{ slurm_conf_group }}"
+    mode: "{{ slurm_conf_mode }}"
+    backup: false
+  when: slurm_with_x11
+
+- name: Remove plugstack.conf.d/x11.conf if it is not being used
+  ansible.builtin.file:
+    path: "{{ slurm_conf_dir }}/plugstack.conf.d/x11.conf"
+    state: absent
+  when: slurm_with_x11

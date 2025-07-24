@@ -1,4 +1,7 @@
 ---
+- name: Load build variables
+  ansible.builtin.include_vars: build.yml
+
 - name: Install build dependencies
   ansible.builtin.dnf:
     name: "{{ item }}"
@@ -46,8 +49,6 @@
     chdir: "{{ slurm_build_dir }}"
     cmd: "{{ make_script_path }}"
 
-# TODO This: https://slurm.schedmd.com/quickstart_admin.html#manual_build
-
 # TODO
 # - name: Install slurm with make
 #   when: slurm_built_method == "make"
@@ -60,3 +61,4 @@
     cscope -i "{{ slurm_src_dir }}/cscope.files" -b
     mv cscope.out "{{ slurm_src_dir }}/"
     mv tags "{{ slurm_src_dir }}/"
+  changed_when: true

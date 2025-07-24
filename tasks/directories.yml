@@ -1,0 +1,22 @@
+---
+# Configure Directories
+- name: Copy pam.d/slurm
+  when: slurm_with_pam
+  ansible.builtin.copy:
+    src: pam_slurm
+    dest: /etc/pam.d/slurm
+    owner: "{{ slurm_conf_owner }}"
+    group: "{{ slurm_conf_group }}"
+    mode: "{{ slurm_conf_mode }}"
+
+- name: Add log, state, and conf directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ slurm_conf_owner }}"
+    group: "{{ slurm_conf_group }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - {path: "{{ slurm_log_dir }}", mode: "{{ slurm_log_mode }}"}
+    - {path: "{{ slurm_state_dir }}", mode: "{{ slurm_state_mode }}"}
+    - {path: "{{ slurm_conf_dir }}", mode: "{{ slurm_dir_mode }}"}

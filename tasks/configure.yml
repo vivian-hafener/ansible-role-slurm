@@ -1,109 +1,45 @@
 ---
-# Configure Directories
-- name: Copy pam.d/slurm
-  when: slurm_with_pam
-  ansible.builtin.copy:
-    src: pam_slurm
-    dest: /etc/pam.d/slurm
-    owner: "{{ slurm_conf_owner }}"
-    group: "{{ slurm_conf_group }}"
-    mode: "{{ slurm_conf_mode }}"
+- name: Load configuration variables
+  ansible.builtin.include_vars: configure.yml
 
-- name: Add slurm log dir
-  ansible.builtin.file:
-    path: "{{ slurm_log_dir }}"
-    state: directory
-    owner: "{{ slurm_conf_owner }}"
-    group: "{{ slurm_conf_group }}"
-    mode: "{{ slurm_log_mode }}"
-
-- name: Add slurm state dir
-  ansible.builtin.file:
-    path: "{{ slurm_state_dir }}"
-    state: directory
-    owner: "{{ slurm_conf_owner }}"
-    group: "{{ slurm_conf_group }}"
-    mode: "{{ slurm_state_mode }}"
-
-- name: Add slurm etc dir
-  ansible.builtin.file:
-    path: "{{ slurm_conf_dir }}"
-    state: directory
-    owner: "{{ slurm_conf_owner }}"
-    group: "{{ slurm_conf_group }}"
-    mode: "{{ slurm_dir_mode }}"
-
-# Template in configuration
-- name: Make from template cgroup.conf
-  ansible.builtin.template:
-    src: cgroup.conf.j2
-    dest: "{{ slurm_conf_dir }}/cgroup.conf"
-    owner: "{{ slurm_conf_owner }}"
-    group: "{{ slurm_conf_group }}"
-    mode: "{{ slurm_conf_mode }}"
-    backup: "{{ slurm_backup_conf }}"
-  # notify: restart slurm
-  when: slurm_with_cgroups
-
-- name: Make from template gres.conf
-  ansible.builtin.template:
-    src: gres.conf.j2
-    dest: "{{ slurm_conf_dir }}/gres.conf"
-    owner: "{{ slurm_conf_owner }}"
-    group: "{{ slurm_conf_group }}"
-    mode: "{{ slurm_conf_mode }}"
-  # notify: restart slurm
-  when: slurm_with_gpu
-
-- name: Make from template topology.conf
-  ansible.builtin.template:
-    src: topology.conf.j2
-    dest: "{{ slurm_conf_dir }}/topology.conf"
-    owner: "{{ slurm_conf_owner }}"
-    group: "{{ slurm_conf_group }}"
-    mode: "{{ slurm_conf_mode }}"
-  # notify: restart slurm
-  when: slurm_with_topo
+- name: Prepare Directories
+  ansible.builtin.include_tasks: directories.yml
 
 - name: Pull in Slurm.conf vars
   ansible.builtin.include_vars: slurm.conf.yml
 
-- name: Make from template slurm.conf
-  ansible.builtin.template:
-    src: slurm.conf.j2
-    dest: "{{ slurm_conf_dir }}/slurm.conf"
+# Template in configuration
+- name: Make configuration files from template
+  ansible.builtin.include_tasks: template.yml
+  vars:
     owner: "{{ slurm_conf_owner }}"
     group: "{{ slurm_conf_group }}"
     mode: "{{ slurm_conf_mode }}"
-    backup: "{{ slurm_backup_conf }}"
-  # notify: restart_slurm # TODO Implement
-  register: slurm_conf_place
+  loop:
+    - {src: "cgroup.conf.j2", dst: "cgroup.conf", cond: slurm_with_cgroups}
+    - {src: "gres.conf.j2", dst: "gres.conf", cond: slurm_with_gpu}
+    - {src: "topology.conf.j2", dst: "topology.conf", cond: slurm_with_topo}
+    - {src: "slurm.conf.j2", dst: "slurm.conf", cond: configure_slurm}
+    - {src: "slurm_rsyslog.conf", dst: "/etc/rsyslog.d/10_slurm_rsyslog.conf", cond: slurm_with_rsyslog}
 
-- name: Pull in Slurm.conf vars
+- name: Pull in Slurmdbd.conf vars
   ansible.builtin.include_vars: slurmdbd.conf.yml
+  when: slurmdbd_host == inventory_hostname
+
+- name: Pull in mariadb vars
+  ansible.builtin.include_vars: mariadb.yml
   when: slurmdbd_host == inventory_hostname
 
 - name: Template in slurmdbd.conf
   ansible.builtin.template:
     src: slurmdbd.conf.j2
-    dest: "{{ slurm_conf_dir}}/slurmdbd.conf"
+    dest: "{{ slurm_conf_dir }}/slurmdbd.conf"
     owner: "{{ slurm_conf_owner }}"
     group: "{{ slurm_conf_group }}"
     mode: '0600'
     backup: "{{ slurm_backup_conf }}"
   register: slurmdbd_place
   when: slurmdbd_host == inventory_hostname
-
-- name: Write all slurm logs handled by rsyslog to one file
-  ansible.builtin.template:
-    src: slurm_rsyslog.conf
-    dest: /etc/rsyslog.d/10_slurm_rsyslog.conf
-    owner: "{{ slurm_conf_owner }}"
-    group: "{{ slurm_conf_group }}"
-    mode: "{{ slurm_conf_mode }}"
-    backup: "{{ slurm_backup_conf }}"
-  # notify: Restart rsyslog
-  when: slurm_with_rsyslog
 
 - name: Configure logrotate
   ansible.builtin.template:
@@ -115,77 +51,9 @@
     backup: false
   when: (slurm_log_dir is defined) and slurm_with_logrotate
 
-- name: Template in plugstack.conf
-  ansible.builtin.template:
-    src: plugstack.conf.j2
-    dest: "{{ slurm_conf_dir }}/plugstack.conf"
-    owner: "{{ slurm_conf_owner }}"
-    group: "{{ slurm_conf_group }}"
-    mode: "{{ slurm_conf_mode }}"
-    backup: "{{ slurm_backup_conf }}"
+- name: Configure plugstack
+  ansible.builtin.include_tasks: plugstack.yml
   when: slurm_with_plugstack
 
-- name: Create slurm/plugstack.conf.d
-  ansible.builtin.file:
-    path: "{{ slurm_conf_dir }}/plugstack.conf.d"
-    state: directory
-    owner: "{{ slurm_conf_owner }}"
-    group: "{{ slurm_conf_group }}"
-    mode: '0755'
-  when: slurm_with_plugstack
-
-- name: Template in plugstack.conf.d/x11.conf
-  ansible.builtin.template:
-    src: x11.conf.j2
-    dest: "{{ slurm_conf_dir }}/plugstack.conf.d/x11.conf"
-    owner: "{{ slurm_conf_owner }}"
-    group: "{{ slurm_conf_group }}"
-    mode: "{{ slurm_conf_mode }}"
-    backup: false
-  when: slurm_with_plugstack and slurm_with_x11
-
-- name: Remove plugstack.conf.d/x11.conf if it is not being used
-  ansible.builtin.file:
-    path: "{{ slurm_conf_dir }}/plugstack.conf.d/x11.conf"
-    state: absent
-  when: slurm_with_plugstack and slurm_with_x11
-
-- name: Template in slurmd.service file
-  ansible.builtin.template:
-    src: "slurmd.service.j2"
-    dest: /etc/systemd/system/slurmd.service
-    owner: "{{ slurm_conf_owner }}"
-    group: "{{ slurm_conf_group }}"
-    mode: "{{ slurm_conf_mode }}"
-
-- name: Template in slurmctld.service file
-  ansible.builtin.template:
-    src: "slurmctld.service.j2"
-    dest: /etc/systemd/system/slurmctld.service
-    owner: "{{ slurm_conf_owner }}"
-    group: "{{ slurm_conf_group }}"
-    mode: "{{ slurm_conf_mode }}"
-  when: (slurmctld_host == inventory_hostname)
-
-- name: Template in slurmdbd.service file
-  ansible.builtin.template:
-    src: "slurmdbd.service.j2"
-    dest: /etc/systemd/system/slurmdbd.service
-    owner: "{{ slurm_conf_owner }}"
-    group: "{{ slurm_conf_group }}"
-    mode: "{{ slurm_conf_mode }}"
-  when: (slurmctld_host == inventory_hostname)
-
-- name: Template in sackd.service file
-  ansible.builtin.template:
-    src: sackd.service.j2
-    dest: /etc/systemd/system/sackd.service
-    owner: "{{ slurm_conf_owner }}"
-    group: "{{ slurm_conf_group }}"
-    mode: "{{ slurm_conf_mode }}"
-  when: slurm_with_sackd
-
-- name: Reload systemd daemon
-  become: true
-  ansible.builtin.systemd_service:
-    daemon_reload: true
+- name: Place systemd service files
+  ansible.builtin.include_tasks: systemd.yml

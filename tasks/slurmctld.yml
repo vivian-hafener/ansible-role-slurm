@@ -22,16 +22,17 @@
     #     SLURM_CONF: "{{ slurm_conf_dir }}/slurm.conf"
 
 - name: Sacctmgr show cluster siteName and store in slurm_clusterlist variable
-  ansible.builtin.shell: "sacctmgr -n show cluster {{ slurm_cluster_name }}  |grep {{ slurm_cluster_name }} | sed -e 's/.* {{ slurm_cluster_name }} .*/FOUND/'"
+  ansible.builtin.shell: "set -o pipefail && sacctmgr -n show cluster {{ slurm_cluster_name }}  |grep {{ slurm_cluster_name }} | sed -e 's/.* {{ slurm_cluster_name }} .*/FOUND/'"
   register: slurm_clusterlist
-  check_mode: no
+  check_mode: false
   changed_when: false
 
 - name: Sacctmgr add cluster to accounting if it is not added already
   ansible.builtin.command: "sacctmgr -i add cluster {{ slurm_cluster_name }} "
   when: (slurm_clusterlist.stdout.find("FOUND") == -1)
+  changed_when: true
 
 - name: Reconfigure when slurm.conf changed
   ansible.builtin.command:
     cmd: scontrol reconfigure
-  when: slurm_conf_place.changed
+  changed_when: true

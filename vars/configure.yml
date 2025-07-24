@@ -1,0 +1,16 @@
+---
+# Cgroups
+slurm_cgroup_mountpoint: "/sys/fs/cgroup"
+slurm_cgroup_constrain_cores: "yes"
+slurm_cgroup_constrain_ram: "no"
+slurm_cgroup_allowedramspace: "100.1" # At which % of requested memory should the process get killed?
+slurm_cgroup_constrain_swap: "no"
+slurm_cgroup_taskaffinity: "no"
+slurm_cgroup_allowedswapspace: "120" # % of memory allocation that can be phys mem+swap
+slurm_cgroup_constrain_devices: "no"
+slurm_cgroup_min_ram: "500" # always allocate this much memory to each job
+
+# Logrotate
+slurm_logrotate_rotate_interval: "weekly"
+slurm_logrotate_rotate: "8"
+slurm_logrotate_signal: "-HUP"

@@ -1,0 +1,10 @@
+---
+- name: Make from template {{ item.src }}
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ slurm_conf_dir }}/{{ item.dst }}"
+    owner: "{{ owner }}"
+    group: "{{ group }}"
+    mode: "{{ mode }}"
+    backup: "{{ slurm_backup_conf }}"
+  when: "{{ item.cond }}"

@@ -1,4 +1,6 @@
 ---
+- name: Load mariadb variables
+  ansible.builtin.include_vars: mariadb.yml
 
 - name: Slurm_mysql_password variable must be set
   ansible.builtin.assert:
