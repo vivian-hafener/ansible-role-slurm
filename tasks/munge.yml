@@ -2,33 +2,47 @@
 
 - name: Does the munge.key exist?
   ansible.builtin.stat:
-    path: /etc/munge/munge.key
+    path: "{{ munge_key_path }}"
   register: mungekeystat
-  check_mode: no
-  ignore_errors: True
+  check_mode: false
+  ignore_errors: true
+  when: slurmctld_host == inventory_hostname
 
 - name: Create munge key
   ansible.builtin.command:
     cmd: /usr/sbin/mungekey
-    creates: /etc/munge/munge.key
+    creates: "{{ munge_key_path }}"
   register: mungekeygen
-  when: mungekeystat is defined and mungekeystat.stat.exists == False
+  when: (not mungekeystat) and (slurmctld_host == inventory_hostname)
 
-- name: Restart munge
-  ansible.builtin.systemd_service:
-    name: munge
-    state: restarted
-  when: mungekeygen.changed and mungekeygen is defined
+- name: Copy munge key to compute nodes
+  ansible.builtin.copy:
+    src: "{{ munge_key_path }}"
+    dest: "{{ munge_key_path }}"
+    owner: munge
+    group: munge
+    mode: '0600'
+  when: inventory_hostname in groups["slurm_compute"]
+  notify:
+    - restart munge
+  delegate_to: "{{ slurmctld_host }}"
+  register: mungekeycopy
 
 - name: Set mungekey permissions
   ansible.builtin.file:
     path: /etc/munge/munge.key
     owner: munge
     group: munge
-    mode: "0600"
+    mode: '0600'
 
-- name: Start and enable munge on service nodes
+- name: Restart munge
+  ansible.builtin.systemd_service:
+    name: munge
+    state: restarted
+  when: ((mungekeygen.changed and mungekeygen is defined) and (slurmctld_host == inventory_hostname)) or (mungekeycopy.changed and mungekeycopy is defined)
+
+- name: Start and enable munge
   ansible.builtin.systemd_service:
     name: munge
     state: started
-    enabled: yes
+    enabled: true
