@@ -4,6 +4,10 @@ user_homedir: "/home/vhafener"
 
 
 # ============ Installation ============
+install_slurm: true
+build_slurm: "{{ install_slurm }}"
+update_slurm: false # TODO Implement this in install.yaml, will need to handle stopping, starting, installing new tag.
+# This can probably be done with a bunch of registers
 
 # Source Configuration
 slurm_repo: https://github.com/SchedMD/slurm
@@ -33,9 +37,22 @@ maketags: false
 
 
 # ============ Configuration ============
+configure_slurm: true
+
+# Configuration file permissions and ownership
+slurm_user: slurm
+slurm_group: slurm
+slurm_conf_mode: '0644' # Does not apply to Mungekey and Slurmdbd.conf for security reasons
+slurm_conf_owner: "{{ slurm_user }}"
+slurm_conf_group: "{{ slurm_group }}"
+slurm_state_mode: '0750'
+slurm_log_mode: '0755'
+slurm_dir_mode: '0755'
+slurm_backup_conf: true
 
 # Cluster Information
 cluster_name: "aspen"
+slurm_cluster_name: "aspen" # TODO Migrate over to this format
 cluster_domain: "vhafener.com"
 slurmctld_host: "n1.{{ cluster_domain }}"
 slurmdbd_host: "n1.{{ cluster_domain }}"
@@ -54,6 +71,14 @@ slurm_with_rsyslog: false
 slurm_with_logrotate: true
 slurm_with_x11: false
 
+# Munge
+munge_key_path: "/etc/munge/munge.key"
+
 # MariaDB
 slurm_manage_mariadb_security: true
+slurm_db_user: slurm
+slurm_mysql_password: "test"
+slurmdb_root_password: "test"
 
+# Systemctl Settings
+slurm_manage_sysctl: false
