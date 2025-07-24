@@ -9,11 +9,13 @@
     name: mariadb
     state: started
     enabled: true
+  register: mariadb_start
 
 - name: Restart mariadb after install
   ansible.builtin.systemd_service:
     name: mariadb
     state: restarted
+  when: not mariadb_start.changed
 
 - name: Wait for mysql in port 3306 to start
   ansible.builtin.wait_for:
@@ -26,9 +28,9 @@
   # check_implicit_admin means it tries without password first
   community.mysql.mysql_user:
     name: root
-    password: "{{ DB_root_password }}"
+    password: "{{ slurmdb_root_password }}"
     check_implicit_admin: true
-  when: (slurm_manage_mariadb_security == true) and not ansible_check_mode
+  when: slurm_manage_mariadb_security and not ansible_check_mode
 
 - name: Template .my.cnf
   ansible.builtin.template:
@@ -36,34 +38,40 @@
     dest: "/root/.my.cnf"
     owner: root
     group: root
-    mode: 0600
-  when: slurm_manage_mysql_security == true
+    mode: '0600'
+  when: slurm_manage_mysql_security
 
 - name: Delete anonymous sql server user for localhost
-  community.mysql.mysql_user: user="" state=absent
-  when: slurm_manage_mysql_security == true
+  community.mysql.mysql_user:
+    user: ""
+    state: absent
+  when: slurm_manage_mysql_security
 
 - name: Remove the mysql test database
-  community.mysql.mysql_db: db=test state=absent
-  when: slurm_manage_mysql_security == true
+  community.mysql.mysql_db:
+    db: test
+    state: absent
+  when: slurm_manage_mysql_security
 
 - name: Create slurm acct db
-  community.mysql.mysql_db: name=slurm_acct_db state=present
-  when: slurm_manage_mysql_security == true
+  community.mysql.mysql_db:
+    name: slurm_acct_db
+    state: present
+  when: slurm_manage_mysql_security
 
 - name: Create slurm sql user
-  community.mysql.mysql_user: 
-    name: slurm 
-    state: present 
+  community.mysql.mysql_user:
+    name: "{{ slurm_db_user }}"
+    state: present
     password: "{{ slurm_mysql_password }}"
   register: mysqlslurmuser
   ignore_errors: true
 
 - name: Ensure slurm sql user has a password and privileges
-  community.mysql.mysql_user: 
-    name: slurm
+  community.mysql.mysql_user:
+    name: "{{}}"
     password: "{{ slurm_mysql_password }}"
     priv: "slurm_acct_db.*:ALL"
-    state: present 
+    state: present
     update_password: always
   when: mysqlslurmuser is failed or mysqlslurmuser is changed
