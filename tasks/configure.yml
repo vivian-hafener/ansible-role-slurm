@@ -10,11 +10,16 @@
     group: "{{ slurm_conf_group }}"
     mode: "{{ slurm_conf_mode }}"
   loop:
-    - {src: "cgroup.conf.j2", dst: "cgroup.conf", cond: slurm_with_cgroups}
-    - {src: "gres.conf.j2", dst: "gres.conf", cond: slurm_with_gpu}
-    - {src: "topology.conf.j2", dst: "topology.conf", cond: slurm_with_topo}
-    - {src: "slurm.conf.j2", dst: "slurm.conf", cond: configure_slurm}
+    - {src: "cgroup.conf.j2", dst: "{{ slurm_conf_dir }}/cgroup.conf", cond: slurm_with_cgroups}
+    - {src: "gres.conf.j2", dst: "{{ slurm_conf_dir }}/gres.conf", cond: slurm_with_gpu}
+    - {src: "topology.conf.j2", dst: "{{ slurm_conf_dir }}/topology.conf", cond: slurm_with_topo}
+    - {src: "slurm.conf.j2", dst: "{{ slurm_conf_dir }}/slurm.conf", cond: configure_slurm}
     - {src: "slurm_rsyslog.conf", dst: "/etc/rsyslog.d/10_slurm_rsyslog.conf", cond: slurm_with_rsyslog}
+    - {src: "slurmd.service.j2", dst: "/etc/systemd/system/slurmd.service", cond: configure_slurm}
+    - {src: "slurmctld.service.j2", dst: "/etc/systemd/system/slurmctld.service", cond: (slurmctld_host == inventory_hostname)}
+    - {src: "slurmdbd.service.j2", dst: "/etc/systemd/system/slurmdbd.service", cond: (slurmctld_host == inventory_hostname)}
+    - {src: "sackd.service.j2", dst: "/etc/systemd/system/sackd.service", cond: slurm_with_sackd}
+
 
 - name: Template in slurmdbd.conf
   ansible.builtin.template:
@@ -41,5 +46,7 @@
   ansible.builtin.include_tasks: plugstack.yml
   when: slurm_with_plugstack
 
-- name: Place systemd service files
-  ansible.builtin.include_tasks: systemd.yml
+- name: Reload systemd daemon
+  become: true
+  ansible.builtin.systemd_service:
+    daemon_reload: true
