@@ -3,6 +3,7 @@
 slurm_repo: https://github.com/SchedMD/slurm
 slurm_version_tag: "slurm-25-05-1-1"
 slurm_version: "25.05"
+slurm_major_version: "25"
 
 # Build directories
 slurm_src_target_dir: "{{ user_homedir }}/slurm/{{ slurm_version }}"
@@ -12,7 +13,7 @@ slurm_build_dir: "{{ slurm_src_target_dir }}/{{ inventory_hostname }}/build"
 # ./configure flags
 # Available options inclue --enable-developer or --enable-multiple-slurmd
 # For none, set to ""
-slurm_configure_flags: "--enable-developer --sysconfdir={{ slurm_conf_dir }}"
+slurm_configure_flags: "--enable-developer --sysconfdir={{ slurm_conf_dir }} {{ slurm_jwt_configure_flags }}"
 
 # Method by which to build slurm. Options are "make.py" or "make"
 slurm_build_method: "make.py"

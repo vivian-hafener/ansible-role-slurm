@@ -1,13 +1,14 @@
 ---
-- name: Load build variables
-  ansible.builtin.include_vars: build.yml
-
 - name: Install build dependencies
   ansible.builtin.dnf:
     name: "{{ item }}"
     state: present
   loop: "{{ slurm_build_deps }}"
   when: install_build_deps
+
+- name: Install JWT
+  ansible.builtin.include_tasks: jwt.yml
+  when: slurm_with_jwt
 
 # TODO Implement build_on_controller and change these to build_on_nodes
 - name: Clone the Slurm repository to the target

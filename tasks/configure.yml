@@ -1,12 +1,6 @@
 ---
-- name: Load configuration variables
-  ansible.builtin.include_vars: configure.yml
-
 - name: Prepare Directories
   ansible.builtin.include_tasks: directories.yml
-
-- name: Pull in Slurm.conf vars
-  ansible.builtin.include_vars: slurm.conf.yml
 
 # Template in configuration
 - name: Make configuration files from template
@@ -21,14 +15,6 @@
     - {src: "topology.conf.j2", dst: "topology.conf", cond: slurm_with_topo}
     - {src: "slurm.conf.j2", dst: "slurm.conf", cond: configure_slurm}
     - {src: "slurm_rsyslog.conf", dst: "/etc/rsyslog.d/10_slurm_rsyslog.conf", cond: slurm_with_rsyslog}
-
-- name: Pull in Slurmdbd.conf vars
-  ansible.builtin.include_vars: slurmdbd.conf.yml
-  when: slurmdbd_host == inventory_hostname
-
-- name: Pull in mariadb vars
-  ansible.builtin.include_vars: mariadb.yml
-  when: slurmdbd_host == inventory_hostname
 
 - name: Template in slurmdbd.conf
   ansible.builtin.template:

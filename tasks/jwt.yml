@@ -1,0 +1,34 @@
+---
+- name: Install build dependencies
+  ansible.builtin.dnf:
+    name: libjwt
+    state: present
+  when: install_build_deps
+
+- name: Create JWT directory
+  ansible.builtin.file:
+    path: "{{ jwt_src_target }}"
+    state: directory
+    mode: '0755'
+
+- name: Clone the repository to the target
+  ansible.builtin.git:
+    repo: "{{ jwt_repo }}"
+    dest: "{{ jwt_src_target }}/libjwt"
+    depth: 1
+    branch: "{{ jwt_branch }}"
+    single_branch: true
+
+- name: Configure JWT
+  ansible.builtin.shell:
+    chdir: "{{ jwt_src_target }}/libjwt"
+    cmd: |
+      autoreconf --force --install
+      ./configure --prefix="{{ jwt_conf_prefix }}"
+      make -j
+
+- name: Install JWT
+  become: true
+  ansible.builtin.cmd:
+    cmd: make install
+    chdir: "{{ jwt_src_target }}/libjwt"

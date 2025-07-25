@@ -8,7 +8,7 @@ configure_slurm_user: false
 update_slurm: false # TODO Implement this in install.yaml, will need to handle stopping, starting, installing new tag.
 # This can probably be done with a bunch of registers
 
-build_slurm: false
+build_slurm: true
 
 configure_slurm: true
 
@@ -59,3 +59,11 @@ munge_key_path: "/etc/munge/munge.key"
 
 # Systemctl Settings
 slurm_manage_sysctl: false
+
+# JWT
+slurm_with_jwt: true
+slurm_jwt_configure_flags: "--with-jwt={{ jwt_conf_prefix }}"
+jwt_repo: "https://github.com/yaml/libyaml"
+jwt_branch: "v1.12.0"
+jwt_src_target: "{{ user_homedir }}/libjwt/{{ jwt_branch }}"
+jwt_conf_prefix: "/usr/local"
