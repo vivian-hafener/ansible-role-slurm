@@ -1,9 +1,16 @@
 ---
+# TODO Only run if JWT branch is different
 - name: Install build dependencies
   ansible.builtin.dnf:
-    name: libjwt
+    name: "{{ item }}"
     state: present
-  when: install_build_deps
+  when: install_jwt_build_deps
+  loop:
+    - libjwt
+    - autoconf
+    - automake
+    - libtool
+    - jansson-devel
 
 - name: Create JWT directory
   ansible.builtin.file:
@@ -15,20 +22,22 @@
   ansible.builtin.git:
     repo: "{{ jwt_repo }}"
     dest: "{{ jwt_src_target }}/libjwt"
-    depth: 1
-    branch: "{{ jwt_branch }}"
+    version: "{{ jwt_branch }}"
     single_branch: true
+    force: true
 
 - name: Configure JWT
+  become: true
   ansible.builtin.shell:
     chdir: "{{ jwt_src_target }}/libjwt"
     cmd: |
+      set -o pipefail && autoupdate
       autoreconf --force --install
       ./configure --prefix="{{ jwt_conf_prefix }}"
       make -j
 
 - name: Install JWT
   become: true
-  ansible.builtin.cmd:
+  ansible.builtin.command:
     cmd: make install
     chdir: "{{ jwt_src_target }}/libjwt"

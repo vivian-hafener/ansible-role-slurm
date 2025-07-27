@@ -2,7 +2,6 @@
 # Source Configuration
 slurm_repo: https://github.com/SchedMD/slurm
 slurm_version_tag: "slurm-25-05-1-1"
-slurm_version: "25.05"
 slurm_major_version: "25"
 
 # Build directories

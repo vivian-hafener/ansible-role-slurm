@@ -2,24 +2,18 @@
 # System details
 user_homedir: "/home/vhafener"
 
-# ============ Task group controls ============
-configure_slurm_user: false
+# ============ Desired system state ============
+# You should not need to touch variables outside of this space
 
-update_slurm: false # TODO Implement this in install.yaml, will need to handle stopping, starting, installing new tag.
-# This can probably be done with a bunch of registers
+build_slurm_auto: true
+slurm_version: "25.05"
+slurm_version_tag: "slurm-25-05-1-1"
 
-build_slurm: true
+munge_when_autobuild: false
+mariadb_when_autobuild: false
 
-configure_slurm: true
-
-configure_slurm_mariadb: true
-
-configure_munge: true
-
-configure_slurmdbd: true
-configure_slurmctld: true
-configure_slurmd: true
-
+install_build_deps: false
+install_jwt_build_deps: false
 
 # ============ Configuration ============
 
@@ -63,7 +57,18 @@ slurm_manage_sysctl: false
 # JWT
 slurm_with_jwt: true
 slurm_jwt_configure_flags: "--with-jwt={{ jwt_conf_prefix }}"
-jwt_repo: "https://github.com/yaml/libyaml"
+jwt_repo: "https://github.com/benmcollins/libjwt.git"
 jwt_branch: "v1.12.0"
 jwt_src_target: "{{ user_homedir }}/libjwt/{{ jwt_branch }}"
 jwt_conf_prefix: "/usr/local"
+install_jwt_build_deps: true # "{{ install_build_deps }}"
+
+# ============ Task group controls ============
+configure_slurm_user: false
+build_slurm: false
+configure_slurm: false
+configure_slurm_mariadb: false
+configure_munge: false
+configure_slurmdbd: false
+configure_slurmctld: false
+configure_slurmd: false
