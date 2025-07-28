@@ -9,6 +9,8 @@ build_slurm_auto: true
 slurm_version: "25.05"
 slurm_version_tag: "slurm-25-05-1-1"
 
+reconfigure_slurm: false
+
 munge_when_autobuild: false
 mariadb_when_autobuild: false
 
@@ -61,7 +63,7 @@ jwt_repo: "https://github.com/benmcollins/libjwt.git"
 jwt_branch: "v1.12.0"
 jwt_src_target: "{{ user_homedir }}/libjwt/{{ jwt_branch }}"
 jwt_conf_prefix: "/usr/local"
-install_jwt_build_deps: true # "{{ install_build_deps }}"
+# install_jwt_build_deps: true # "{{ install_build_deps }}"
 
 # ============ Task group controls ============
 configure_slurm_user: false

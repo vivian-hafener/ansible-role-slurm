@@ -13,7 +13,7 @@
 
 - name: Configure
   ansible.builtin.include_tasks: configure.yml
-  when: configure_slurm or build_slurm_auto
+  when: (configure_slurm or reconfigure_slurm) or build_slurm_auto
 
 - name: Set up Mariadb
   ansible.builtin.include_tasks: mariadb.yml
@@ -25,12 +25,12 @@
 
 - name: Set up slurmdbd
   ansible.builtin.include_tasks: slurmdbd.yml
-  when: (slurmdbd_host == inventory_hostname) and (configure_slurmdbd or build_slurm_auto)
+  when: (slurmdbd_host == inventory_hostname) and (configure_slurmdbd or build_slurm_auto or reconfigure_slurm)
 
 - name: Set up slurmctld
   ansible.builtin.include_tasks: slurmctld.yml
-  when: (slurmctld_host == inventory_hostname) and (configure_slurmctld or build_slurm_auto)
+  when: (slurmctld_host == inventory_hostname) and (configure_slurmctld or build_slurm_auto or reconfigure_slurm)
 
 - name: Set up slurmds
   ansible.builtin.include_tasks: slurmd.yml
-  when: (inventory_hostname in groups['slurm_compute']) and (configure_slurmd or build_slurm_auto)
+  when: (inventory_hostname in groups['slurm_compute']) and (configure_slurmd or build_slurm_auto or reconfigure_slurm)
