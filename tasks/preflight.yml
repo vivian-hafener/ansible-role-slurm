@@ -37,3 +37,16 @@
   ansible.builtin.set_fact:
     build_slurm_auto: "{{ not slurm_version in slurmdbd_version.stdout | default('true') }}"
   when: slurmdbd_host == inventory_hostname
+
+- name: Clone the Slurm repository to the target
+  ansible.builtin.git:
+    repo: "{{ slurm_repo }}"
+    dest: "{{ slurm_src_target_dir }}"
+    version: "{{ slurm_version_tag }}"
+    accept_hostkey: "{{ accept_gitlab_hostkey }}"
+  register: cloned_slurm
+
+- name: Set to autobuild on tag move
+  ansible.builtin.set_fact:
+    build_slurm_auto: true
+  when: cloned_slurm.changed
