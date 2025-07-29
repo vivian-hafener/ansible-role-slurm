@@ -1,8 +1,27 @@
 ---
-- name: Prepare Directories
-  ansible.builtin.include_tasks: directories.yml
+# Prepare Configuration Directories
+- name: Copy pam.d/slurm
+  when: slurm_with_pam
+  ansible.builtin.copy:
+    src: pam_slurm
+    dest: /etc/pam.d/slurm
+    owner: "{{ slurm_conf_owner }}"
+    group: "{{ slurm_conf_group }}"
+    mode: "{{ slurm_conf_mode }}"
 
-# Template in configuration
+- name: Add log, state, and conf directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ slurm_conf_owner }}"
+    group: "{{ slurm_conf_group }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - {path: "{{ slurm_log_dir }}", mode: "{{ slurm_log_mode }}"}
+    - {path: "{{ slurm_state_dir }}", mode: "{{ slurm_state_mode }}"}
+    - {path: "{{ slurm_conf_dir }}", mode: "{{ slurm_dir_mode }}"}
+
+# Template in Configuration Files
 - name: Make configuration files from template
   ansible.builtin.include_tasks: template.yml
   vars:
@@ -45,6 +64,23 @@
 - name: Configure plugstack
   ansible.builtin.include_tasks: plugstack.yml
   when: slurm_with_plugstack
+
+# REF: https://slurm.schedmd.com/jwt.html#setup
+- name: Generate JWT Key
+  become: true
+  ansible.builtin.command:
+    cmd: "dd if=/dev/random of={{ jwt_key_path }} bs=32 count=1"
+    creates: "{{ jwt_key_path }}"
+  when: slurm_with_jwt
+
+- name: Set ownership of JWT key
+  become: true
+  ansible.builtin.file:
+    path: "{{ jwt_key_path }}"
+    owner: "{{ slurm_conf_owner }}"
+    group: "{{ slurm_conf_group }}"
+    mode: '600'
+  when: slurm_with_jwt
 
 - name: Reload systemd daemon
   become: true
