@@ -3,7 +3,7 @@
 Description=Slurm auth and cred kiosk daemon
 After=network-online.target remote-fs.target
 Wants=network-online.target
-#ConditionPathExists={{ slurm_sysconf_dir }}/slurm.conf
+#ConditionPathExists={{ slurm_conf_dir }}/slurm.conf
 
 [Service]
 Type=notify

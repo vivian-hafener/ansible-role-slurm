@@ -3,7 +3,7 @@
 Description=Slurm node daemon
 After=munge.service network-online.target remote-fs.target sssd.service
 Wants=network-online.target
-#ConditionPathExists={{ slurm_sysconf_dir }}/slurm.conf
+#ConditionPathExists={{ slurm_conf_dir }}/slurm.conf
 
 [Service]
 Type=notify

@@ -9,6 +9,9 @@ SlurmctldAddr={{ slurm_control_addr }}
 {% endif %}
 SlurmctldPort={{ slurmctld_port }}
 SlurmctldPidFile={{ slurmctld_pid_file }}
+{% if slurm_slurmctld_params is defined %}
+SlurmctldParameters={{ slurm_slurmctld_params }}
+{% endif %}
 
 # Users
 SlurmUser={{ slurm_user }}
@@ -30,6 +33,7 @@ ProctrackType={{ slurm_proctrack_type }}
 FirstJobId={{ slurm_first_job_id }}
 ReturnToService={{ slurm_return_to_service }}
 TaskPlugin={{ slurm_task_plugin }}
+PrologFlags={{ slurm_prolog_flags }}
 
 {% if slurm_jobsubmitplugins is defined %}
 JobSubmitPlugins={{ slurm_jobsubmitplugins }}
@@ -69,6 +73,12 @@ DebugFlags={{ slurm_debug_flags }}
 # ACCOUNTING
 AccountingStorageType={{ slurm_accounting_storage_type }}
 AccountingStorageHost={{ slurmdbd_host }}
+
+{% if slurm_with_jwt %}
+AuthAltTypes={{ slurm_auth_alt_types }}
+AuthAltParameters={{ slurm_auth_alt_params }}
+{% endif %}
+
 
 # TOPOLOGY
 {% if slurm_with_topo %}

@@ -5,6 +5,7 @@
 # Controller
 slurmctld_port: "6817"
 slurmctld_pid_file: "/var/run/slurmctld.pid"
+# slurm_slurmctld_params: "enable_stepmgr"
 
 # Slurmd
 slurmd_port: "6819"
@@ -19,9 +20,10 @@ slurm_proctrack_type: "proctrack/cgroup" # TODO Make this dymanic on slurm_with_
 slurm_first_job_id: "1"
 slurm_return_to_service: "1"
 slurm_task_plugin: "task/cgroup,task/affinity" # TODO Make this dymanic on slurm_with_cgroups
+slurm_prolog_flags: "contain"
 
 # GPUS
-# slurm_grestypes: 
+# slurm_grestypes:
 
 # Timers
 slurmd_timeout: 300
@@ -48,6 +50,10 @@ slurm_accounting_storage_type: "accounting_storage/slurmdbd"
 # # Nodelists:
 slurm_nodelist:
   - "NodeName=n[2-4] RealMemory=12000"
+
+# JWT
+slurm_auth_alt_types: "auth/jwt"
+slurm_auth_alt_params: "jwt_key={{ jwt_key_path }}"
 
 # Partitions:
 # slurm_partitionlist:

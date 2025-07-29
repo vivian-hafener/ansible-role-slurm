@@ -15,7 +15,8 @@ munge_when_autobuild: false
 mariadb_when_autobuild: false
 
 install_build_deps: false
-install_jwt_build_deps: false
+
+slurm_services_state: "started"
 
 # ============ Configuration ============
 
@@ -30,7 +31,7 @@ slurm_log_mode: '0755'
 slurm_dir_mode: '0755'
 slurm_backup_conf: true
 
-# Cluster Information
+# Cluster Information and Directories
 slurm_cluster_name: "aspen" # TODO Migrate over to this format
 slurm_cluster_domain: "vhafener.com"
 slurmctld_host: "n1.{{ slurm_cluster_domain }}"
@@ -38,6 +39,7 @@ slurmdbd_host: "n1.{{ slurm_cluster_domain }}"
 slurm_log_dir: "/var/log/slurm"
 slurm_state_dir: "/var/spool/slurm"
 slurm_conf_dir: /etc/slurm
+slurm_sbin_dir: /usr/local/sbin
 
 # Feature toggles
 slurm_with_pam: false
@@ -53,8 +55,11 @@ slurm_with_x11: false
 # Munge
 munge_key_path: "/etc/munge/munge.key"
 
-# Systemctl Settings
+# Systemd Settings
 slurm_manage_sysctl: false
+slurmctld_service_state: "{{ slurm_services_state }}"
+slurmd_service_state: "{{ slurm_services_state }}"
+slurmdbd_service_state: "{{ slurm_services_state }}"
 
 # JWT
 slurm_with_jwt: true
@@ -63,7 +68,8 @@ jwt_repo: "https://github.com/benmcollins/libjwt.git"
 jwt_branch: "v1.12.0"
 jwt_src_target: "{{ user_homedir }}/libjwt/{{ jwt_branch }}"
 jwt_conf_prefix: "/usr/local"
-# install_jwt_build_deps: true # "{{ install_build_deps }}"
+jwt_key_path: "{{ slurm_state_dir }}/jwt_hs256.key"
+install_jwt_build_deps: false
 
 # ============ Task group controls ============
 configure_slurm_user: false
@@ -74,3 +80,9 @@ configure_munge: false
 configure_slurmdbd: false
 configure_slurmctld: false
 configure_slurmd: false
+
+# TODO Fix the formatting of below
+#PID Files
+slurm_SlurmctldPidFile: "/var/run/slurm/slurmctld.pid"
+slurm_SlurmdbdPidFile: "/var/run/slurm/slurmdbd.pid"
+slurm_SlurmdPidFile: "/var/run/slurm/slurmd.pid"

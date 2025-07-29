@@ -28,6 +28,8 @@ maketags: false
 
 # Slurm build dependencies
 install_build_deps: false
+
+# REF: https://slurm.schedmd.com/quickstart_admin.html#prereqs
 slurm_build_deps:
   - "@development-tools"
   - clang
