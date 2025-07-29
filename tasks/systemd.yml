@@ -8,13 +8,14 @@
     - {name: slurmdbd.service, state: "{{ slurmdbd_service_state }}", cond: "(slurmdbd_host == inventory_hostname) and (configure_slurmdbd or build_slurm_auto or reconfigure_slurm)"}
     - {name: slurmctld.service, state: "{{ slurmctld_service_state }}", cond: "(slurmctld_host == inventory_hostname) and (configure_slurmctld or build_slurm_auto or reconfigure_slurm)"}
     - {name: slurmd.service, state: "{{ slurmd_service_state }}", cond: "(inventory_hostname in groups['slurm_compute']) and (configure_slurmd or build_slurm_auto or reconfigure_slurm)"}
+    - {name: sackd.service, state: "{{ sackd_service_state }}", cond: "(slurmctld_host == inventory_hostname) and (configure_slurmd or build_slurm_auto or reconfigure_slurm) and slurm_with_sackd"}
 
 # Reconfigure when slurm.conf changed
 - name: Reconfigure when slurm.conf changed
   ansible.builtin.command:
     cmd: scontrol reconfigure
   changed_when: true
-  when: slurm.conf.j2_placed.changed or slurmctld.service.j2_placed.changed
+  when: conf.changed
 
 # Initial Standup Tasks
 - name: Sacctmgr show cluster siteName and store in slurm_clusterlist variable
@@ -22,9 +23,9 @@
   register: slurm_clusterlist
   check_mode: false
   changed_when: false
-  when: slurm_acct_db_created
+  when: (slurmdbd_host == inventory_hostname) and (configure_slurm_mariadb or (build_slurm_auto and mariadb_when_autobuild)) and slurm_acct_db_created.created
 
 - name: Sacctmgr add cluster to accounting if it is not added already
   ansible.builtin.command: "sacctmgr -i add cluster {{ slurm_cluster_name }} "
-  when: slurm_acct_db_created and (slurm_clusterlist.stdout.find("FOUND") == -1)
+  when: (slurmdbd_host == inventory_hostname) and (configure_slurm_mariadb or (build_slurm_auto and mariadb_when_autobuild)) and slurm_acct_db_created.created and (slurm_clusterlist.stdout.find("FOUND") == -1)
   changed_when: true

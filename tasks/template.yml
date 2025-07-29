@@ -8,4 +8,5 @@
     mode: "{{ mode }}"
     backup: "{{ slurm_backup_conf }}"
   when: "{{ item.cond }}"
-  register: "{{ item.src }}_placed"
+  # TODO Find out idiomatic way to do below
+  # register: "{{ item.src }}_placed"
