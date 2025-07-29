@@ -8,3 +8,4 @@
     mode: "{{ mode }}"
     backup: "{{ slurm_backup_conf }}"
   when: "{{ item.cond }}"
+  register: "{{ item.src }}_placed"

@@ -1,4 +1,5 @@
 ---
+# TASK REF: https://slurm.schedmd.com/accounting.html#mysql-configuration
 - name: Slurm_mysql_password variable must be set
   ansible.builtin.assert:
     that: "slurm_mysql_password is defined"
@@ -57,6 +58,7 @@
     name: slurm_acct_db
     state: present
   when: slurm_manage_mariadb_security
+  register: slurm_acct_db_created
 
 - name: Create slurm sql user
   community.mysql.mysql_user:

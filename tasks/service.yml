@@ -1,0 +1,7 @@
+---
+- name: Set state of {{ item.name }}
+  ansible.builtin.systemd_service:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    enabled: "{{ item.enabled }}"
+  when: "{{ item.cond }}"

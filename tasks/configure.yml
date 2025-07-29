@@ -38,6 +38,8 @@
     - {src: "slurmctld.service.j2", dst: "/etc/systemd/system/slurmctld.service", cond: (slurmctld_host == inventory_hostname)}
     - {src: "slurmdbd.service.j2", dst: "/etc/systemd/system/slurmdbd.service", cond: (slurmctld_host == inventory_hostname)}
     - {src: "sackd.service.j2", dst: "/etc/systemd/system/sackd.service", cond: slurm_with_sackd}
+    - {src: "cgroup_allowed_devices_file.j2", dst: "{{ slurm_conf_dir }}/cgroup_allowed_devices_file.conf", cond: slurm_with_cgroups}
+    - {src: "slurm_logrotate.j2", dst: "/etc/logrotate.d/slurm", cond: (slurm_log_dir is defined) and slurm_with_logrotate}
 
 
 - name: Template in slurmdbd.conf
@@ -51,16 +53,6 @@
   register: slurmdbd_place
   when: slurmdbd_host == inventory_hostname
 
-- name: Configure logrotate
-  ansible.builtin.template:
-    src: slurm_logrotate.j2
-    dest: /etc/logrotate.d/slurm
-    owner: "{{ slurm_conf_owner }}"
-    group: "{{ slurm_conf_group }}"
-    mode: "{{ slurm_conf_mode }}"
-    backup: false
-  when: (slurm_log_dir is defined) and slurm_with_logrotate
-
 - name: Configure plugstack
   ansible.builtin.include_tasks: plugstack.yml
   when: slurm_with_plugstack
@@ -73,6 +65,7 @@
     creates: "{{ jwt_key_path }}"
   when: slurm_with_jwt
 
+# REF: https://slurm.schedmd.com/jwt.html#setup
 - name: Set ownership of JWT key
   become: true
   ansible.builtin.file:
@@ -81,6 +74,22 @@
     group: "{{ slurm_conf_group }}"
     mode: '600'
   when: slurm_with_jwt
+
+# REF: https://slurm.schedmd.com/high_throughput.html#sys_config
+- name: Increase net.core.somaxconn for slurmctld
+  ansible.posix.sysctl:
+    name: net.core.somaxconn
+    value: "{{ slurm_sysctl_core_somaxconn }}"
+    sysctl_file: /etc/sysctl.d/50-slurm.conf
+  when: slurm_manage_sysctl
+
+# REF: https://slurm.schedmd.com/high_throughput.html#sys_config
+- name: Increase net.ipv4.tcp_max_syn_backlog for slurmctld
+  ansible.posix.sysctl:
+    name: net.ipv4.tcp_max_syn_backlog
+    value: "{{ slurm_sysctl_tcp_max_syn_backlog }}"
+    sysctl_file: /etc/sysctl.d/50-slurm.conf
+  when: slurm_manage_sysctl
 
 - name: Reload systemd daemon
   become: true

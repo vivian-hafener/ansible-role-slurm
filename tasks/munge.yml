@@ -1,5 +1,5 @@
 ---
-
+# TASK REF: https://slurm.schedmd.com/authentication.html#munge
 - name: Does the munge.key exist?
   ansible.builtin.stat:
     path: "{{ munge_key_path }}"

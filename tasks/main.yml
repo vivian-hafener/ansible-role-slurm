@@ -1,5 +1,5 @@
 ---
-- name: Preflight checks to detemine tasking
+- name: Preflight checks to determine tasking
   ansible.builtin.include_tasks: preflight.yml
   when: build_slurm_auto
 
@@ -15,22 +15,15 @@
   ansible.builtin.include_tasks: configure.yml
   when: (configure_slurm or reconfigure_slurm) or build_slurm_auto
 
+# TASK REF: https://slurm.schedmd.com/accounting.html#mysql-configuration
 - name: Set up Mariadb
   ansible.builtin.include_tasks: mariadb.yml
   when: (slurmdbd_host == inventory_hostname) and (configure_slurm_mariadb or (build_slurm_auto and mariadb_when_autobuild))
 
+# TASK REF: https://slurm.schedmd.com/authentication.html#munge
 - name: Configure Munge
   ansible.builtin.include_tasks: munge.yml
   when: configure_munge or (build_slurm_auto and munge_when_autobuild)
 
-- name: Set up slurmdbd
-  ansible.builtin.include_tasks: slurmdbd.yml
-  when: (slurmdbd_host == inventory_hostname) and (configure_slurmdbd or build_slurm_auto or reconfigure_slurm)
-
-- name: Set up slurmctld
-  ansible.builtin.include_tasks: slurmctld.yml
-  when: (slurmctld_host == inventory_hostname) and (configure_slurmctld or build_slurm_auto or reconfigure_slurm)
-
-- name: Set up slurmds
-  ansible.builtin.include_tasks: slurmd.yml
-  when: (inventory_hostname in groups['slurm_compute']) and (configure_slurmd or build_slurm_auto or reconfigure_slurm)
+- name: Set Slurm Systemd Service State
+  ansible.builtin.include_tasks: systemd.yml
