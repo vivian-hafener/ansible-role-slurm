@@ -46,7 +46,7 @@ slurm_with_pam: false
 slurm_with_gpu: false
 slurm_with_cgroups: true
 slurm_with_plugstack: false
-slurm_with_sackd: false
+slurm_with_sackd: true
 slurm_with_topo: false
 slurm_with_rsyslog: false
 slurm_with_logrotate: true
@@ -80,9 +80,3 @@ configure_munge: false
 configure_slurmdbd: false
 configure_slurmctld: false
 configure_slurmd: false
-
-# TODO Fix the formatting of below
-#PID Files
-slurm_SlurmctldPidFile: "/var/run/slurm/slurmctld.pid"
-slurm_SlurmdbdPidFile: "/var/run/slurm/slurmdbd.pid"
-slurm_SlurmdPidFile: "/var/run/slurm/slurmd.pid"

@@ -10,6 +10,7 @@
 - name: Build
   ansible.builtin.include_tasks: build.yml
   when: build_slurm or build_slurm_auto
+# TODO [EXTERNAL] - Set up other options for installation
 
 - name: Configure
   ansible.builtin.include_tasks: configure.yml
