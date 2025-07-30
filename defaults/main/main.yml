@@ -7,18 +7,60 @@ user_homedir: "/home/vhafener"
 
 build_slurm_auto: true
 slurm_version: "25.05"
-slurm_version_tag: "slurm-25-05-1-1"
 
 reconfigure_slurm: false
 
 munge_when_autobuild: false
 mariadb_when_autobuild: false
 
-install_build_deps: false
-
 slurm_services_state: "started"
+slurm_restapi: true
 
 # ============ Configuration ============
+slurm:
+  # Slurm User and Group Names
+  user: slurm
+  group: slurm
+
+  # Slurm Configuration Directory
+  config:
+    mode: '0644'
+    owner: "{{ slurm.user }}"
+    group: "{{ slurm.group }}"
+    dir: "/etc/slurm"
+    dir_mode: '0755'
+    backup: true
+
+  # Slurm State Directory
+  state:
+    mode: '0750'
+    dir: "/var/spool/slurm"
+
+  # Slurm Log Directory
+  log:
+    mode: '0755'
+    dir: "/var/log/slurm"
+
+  # Cluster Configuration
+  cluster:
+    name: aspen
+    domain: "vhafener.com"
+    ctld_host: "n1.{{ slurm.cluster.domain }}"
+    dbd_host: "n1.{{ slurm.cluster.domain }}"
+
+  # Features
+  with:
+    gpu: false
+    pam: false
+    cgroups: true
+    plugstack: false
+    sackd: true
+    topo: false
+    rsyslog: false
+    logrotate: false
+    x11: false
+
+
 
 # Configuration file permissions and ownership
 slurm_user: slurm

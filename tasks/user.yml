@@ -7,11 +7,11 @@
 
 - name: Add slurm unix user
   ansible.builtin.user:
-    name: "{{ slurm_user }}"
+    name: "{{ slurm.user }}"
     shell: /sbin/nologin
     create_home: false
     system: false
-    groups: "{{ slurm_group }}"
+    groups: "{{ slurm.group }}"
     state: present
 
 # REF: https://slurm.schedmd.com/rest_quickstart.html#systemd
