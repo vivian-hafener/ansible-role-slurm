@@ -4,7 +4,7 @@
     name: "{{ item }}"
     state: present
   loop: "{{ slurm_build_deps }}"
-  when: install_build_deps
+  when: build.with_dependencies
 
 - name: Install JWT
   ansible.builtin.include_tasks: jwt.yml
@@ -13,47 +13,34 @@
 # REF: https://slurm.schedmd.com/quickstart_admin.html#manual_build
 - name: Create build dir
   ansible.builtin.file:
-    path: "{{ slurm_build_dir }}"
+    path: "{{ build.dir }}"
     state: directory
     owner: "{{ slurm_user }}"
-    mode: "{{ slurm_dir_mode }}"
+    mode: "{{ slurm.conf.dir_mode }}"
 
 - name: Configure Slurm
   ansible.builtin.command:
-    chdir: "{{ slurm_build_dir }}"
-    cmd: "{{ slurm_src_dir }}/configure {{ slurm_configure_flags }}"
+    chdir: "{{ build.dir }}"
+    cmd: "{{ src.dir }}/configure {{ build.flags }}"
   register: configure_slurm
   changed_when: "configure_slurm.rc == 0"
 
-- name: Create scripts dir
-  ansible.builtin.file:
-    path: "{{ slurm_scripts_dir }}"
-    state: directory
-    mode: "{{ slurm_dir_mode }}"
-
-- name: Place make script
-  when: place_make_script
-  ansible.builtin.copy:
-    src: "{{ make_script_src }}"
-    dest: "{{ make_script_path }}"
-    mode: "0755"
-
-- name: Install slurm with make.py
-  when: slurm_build_method == "make.py"
+- name: Install Slurm using a build script
+  when: build.method == "script"
   ansible.builtin.script:
-    chdir: "{{ slurm_build_dir }}"
-    cmd: "{{ make_script_path }}"
+    chdir: "{{ build.dir }}"
+    cmd: "{{ build.script }}"
 
 # TODO [EXTERNAL] Configure installation with make
 # - name: Install slurm with make
 #   when: slurm_built_method == "make"
 
 - name: Make tags with ctags
-  when: maketags
+  when: build.with_tags
   ansible.builtin.shell: |
-    find "{{ slurm_src_dir }}/" -name *.c -o -name *.h -o -name slurm.h.in > "{{ slurm_src_dir }}/cscope.files"
-    ctags -R --language-force=Tcl --append=yes "{{ slurm_src_dir }}/testsuite/expect/*"
-    cscope -i "{{ slurm_src_dir }}/cscope.files" -b
-    mv cscope.out "{{ slurm_src_dir }}/"
-    mv tags "{{ slurm_src_dir }}/"
+    find "{{ src.dir }}/" -name *.c -o -name *.h -o -name slurm.h.in > "{{ src.dir }}/cscope.files"
+    ctags -R --language-force=Tcl --append=yes "{{ src.dir }}/testsuite/expect/*"
+    cscope -i "{{ src.dir }}/cscope.files" -b
+    mv cscope.out "{{ src.dir }}/"
+    mv tags "{{ src.dir }}/"
   changed_when: true

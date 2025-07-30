@@ -9,13 +9,7 @@
     - {name: slurmctld.service, state: "{{ slurmctld_service_state }}", cond: "(slurmctld_host == inventory_hostname) and (configure_slurmctld or build_slurm_auto or reconfigure_slurm)"}
     - {name: slurmd.service, state: "{{ slurmd_service_state }}", cond: "(inventory_hostname in groups['slurm_compute']) and (configure_slurmd or build_slurm_auto or reconfigure_slurm)"}
     - {name: sackd.service, state: "{{ sackd_service_state }}", cond: "(slurmctld_host == inventory_hostname) and (configure_slurmd or build_slurm_auto or reconfigure_slurm) and slurm_with_sackd"}
-
-# Reconfigure when slurm.conf changed
-- name: Reconfigure when slurm.conf changed
-  ansible.builtin.command:
-    cmd: scontrol reconfigure
-  changed_when: true
-  when: conf.changed
+    - {name: slurmrestd.service, state: "{{ slurmrestd_service_state }}", cond: "(slurmctld_host == inventory_hostname) and (configure_slurmd or build_slurm_auto or reconfigure_slurm) and slurm_restapi"}
 
 # Initial Standup Tasks
 - name: Sacctmgr show cluster siteName and store in slurm_clusterlist variable

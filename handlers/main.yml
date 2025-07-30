@@ -1,0 +1,36 @@
+---
+- name: Restart mariadb
+  ansible.builtin.systemd_service:
+    name: mariadb
+    state: restarted
+
+- name: Restart munge
+  ansible.builtin.systemd_service:
+    name: munge
+    state: restarted
+
+- name: Reload daemon
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  
+- name: Restart slurmctld
+  ansible.builtin.systemd_service:
+    name: slurmctld
+    state: restarted
+
+- name: Restart slurmd
+  ansible.builtin.systemd_service:
+    name: slurmd
+    state: restarted
+
+- name: Restart slurmdbd
+  ansible.builtin.systemd_service:
+    name: slurmdbd
+    state: restarted
+
+- name: Scontrol reconfig
+  become: true
+  ansible.builtin.command:
+    cmd: scontrol reconfigure
+  when: slurmctld_host == inventory_hostname
+  changed_when: true

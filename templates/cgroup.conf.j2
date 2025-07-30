@@ -7,19 +7,16 @@
 #--
 # Templated by ansible, don't edit manually.
 #
-CgroupMountpoint={{ slurm_cgroup_mountpoint }}
+CgroupMountpoint={{ slurm.cgroups.mountpoint }}
 CgroupPlugin=autodetect
-ConstrainCores={{ slurm_cgroup_constrain_cores }}
-{% if slurm_major_version|int < 21 %}
-TaskAffinity={{ slurm_cgroup_taskaffinity }}
+ConstrainCores={{ slurm.cgroups.constrain.cores }}
+{% if src.version|int < 21 %}
+TaskAffinity={{ slurm.cgroups.task_affinity }}
 {% endif %}
-{% if slurm_cgroup_constrain_kmem_space is defined %}
-ConstrainKmemSpace={{ slurm_cgroup_constrain_kmem_space }}
-{% endif %}
-ConstrainRAMSpace={{ slurm_cgroup_constrain_ram }}
-ConstrainSwapSpace={{ slurm_cgroup_constrain_swap }}
-AllowedRAMSpace={{ slurm_cgroup_allowedramspace }}
-MinRAMSpace={{ slurm_cgroup_min_ram }}
-AllowedSwapSpace={{ slurm_cgroup_allowedswapspace }}
-ConstrainDevices={{ slurm_cgroup_constrain_devices }}
+ConstrainRAMSpace={{ slurm.cgroups.constrain.ram }}
+ConstrainSwapSpace={{ slurm.cgroups.constrain.swap }}
+AllowedRAMSpace={{ slurm.cgroups.allowed_space.ram }}
+MinRAMSpace={{ slurm.cgroups.min.ram }}
+AllowedSwapSpace={{ slurm.cgroups.allowed_space.swap }}
+ConstrainDevices={{ slurm.cgroups.constrain.devices }}
 

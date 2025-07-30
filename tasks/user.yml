@@ -13,3 +13,12 @@
     system: false
     groups: "{{ slurm_group }}"
     state: present
+
+# REF: https://slurm.schedmd.com/rest_quickstart.html#systemd
+- name: Add slurmrestd user
+  ansible.builtin.user:
+    name: slurmrestd
+    create_home: false
+    system: true
+    shell: /sbin/nologin
+  when: slurm_restapi

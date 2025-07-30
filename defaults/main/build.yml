@@ -1,71 +1,55 @@
 ---
-# Source Configuration
-slurm_repo: https://github.com/SchedMD/slurm
-slurm_version_tag: "slurm-25-05-1-1"
-slurm_major_version: "25"
+src:
+  repo: "https://github.com/SchedMD/slurm"
+  tag: "slurm-25-05-1-1"
+  version: "25"
+  dir: "{{ user_homedir }}/slurm/{{ src.version }}"
 
-# Build directories
-slurm_src_target_dir: "{{ user_homedir }}/slurm/{{ slurm_version }}"
-slurm_src_dir: "{{ slurm_src_target_dir }}"
-slurm_build_dir: "{{ slurm_src_target_dir }}/{{ inventory_hostname }}/build"
-
-# ./configure flags
-# Available options inclue --enable-developer or --enable-multiple-slurmd
-# For none, set to ""
-slurm_configure_flags: "--enable-developer --sysconfdir={{ slurm_conf_dir }} {{ slurm_jwt_configure_flags }}"
-
-# Method by which to build slurm. Options are "make.py" or "make"
-slurm_build_method: "make.py"
-
-# Make script config
-place_make_script: true
-slurm_scripts_dir: "{{ user_homedir }}/slurm/scripts"
-make_script_path: "{{ slurm_scripts_dir }}/make.py"
-make_script_src: "{{ make_script_path }}"
-
-# Maketags with ctags
-maketags: false
-
-# Slurm build dependencies
-install_build_deps: false
-
-# REF: https://slurm.schedmd.com/quickstart_admin.html#prereqs
-slurm_build_deps:
-  - "@development-tools"
-  - clang
-  - clang-analyzer
-  - expect
-  - gtk2-devel
-  - hdf5-devel
-  - http-parser-devel
-  - hwloc-devel
-  - json-c-devel
-  - libcurl-devel
-  - libjwt-devel
-  - libevent-devel
-  - libibmad-devel
-  - libibumad-devel
-  - OpenIPMI
-  - libssh2-devel
-  - libyaml-devel
-  - lua-devel
-  - lz4-devel
-  - man
-  - man2html
-  - mariadb
-  - mariadb-devel
-  - munge
-  - munge-devel
-  - ncurses-devel
-  - numactl-devel
-  - openssl-devel
-  - pam-devel
-  - perl-ExtUtils-MakeMaker
-  - perl-ExtUtils-ParseXS
-  - pmix-devel
-  - python3
-  - readline-devel
-  - rrdtool-devel
-  - vim
-  - which
-  - dbus-devel
+build:
+  dir: "{{ src.dir }}/{{ inventory_hostname }}/build"
+  flags: "--enable-developer --sysconfdir={{ slurm_conf_dir }} {{ slurm_jwt_configure_flags }}"
+  method: "script"
+  script: "/home/vhafener/slurm/scripts/make.py"
+  with_tags: false
+  
+  # REF: https://slurm.schedmd.com/quickstart_admin.html#prereqs
+  with_dependencies: false
+  dependencies:
+    - "@development-tools"
+    - clang
+    - clang-analyzer
+    - expect
+    - gtk2-devel
+    - hdf5-devel
+    - http-parser-devel
+    - hwloc-devel
+    - json-c-devel
+    - libcurl-devel
+    - libjwt-devel
+    - libevent-devel
+    - libibmad-devel
+    - libibumad-devel
+    - OpenIPMI
+    - libssh2-devel
+    - libyaml-devel
+    - lua-devel
+    - lz4-devel
+    - man
+    - man2html
+    - mariadb
+    - mariadb-devel
+    - munge
+    - munge-devel
+    - ncurses-devel
+    - numactl-devel
+    - openssl-devel
+    - pam-devel
+    - perl-ExtUtils-MakeMaker
+    - perl-ExtUtils-ParseXS
+    - pmix-devel
+    - python3
+    - readline-devel
+    - rrdtool-devel
+    - vim
+    - which
+    - dbus-devel

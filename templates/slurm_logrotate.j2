@@ -1,42 +1,42 @@
 # Managed by ansible
 {% if slurm_log_dir is defined %}
 {{ slurm_log_dir }}/slurmdbd.log {
-	{{ slurm_logrotate_rotate_interval }}
+	{{ slurm.logrotate.interval }}
 	missingok
 	notifempty
 	sharedscripts
-	rotate {{ slurm_logrotate_rotate }}
+	rotate {{ slurm.logrotate.rotate }}
 	compress
 	create 644 slurm slurm
 	postrotate
-		/bin/kill {{ slurm_logrotate_signal }} $([[ -r {{ slurmdbd_pid_file }} ]] && cat {{ slurmdbd_pid_file }}) 2>/dev/null 2> /dev/null || true
+		/bin/kill {{ slurm.logrotate.signal }} $([[ -r {{ slurmdbd_pid_file }} ]] && cat {{ slurmdbd_pid_file }}) 2>/dev/null 2> /dev/null || true
 	endscript
 }
 {{ slurm_log_dir }}/slurm.log {
-	{{ slurm_logrotate_rotate_interval }}
+	{{ slurm.logrotate.interval }}
 	missingok
 	notifempty
 	sharedscripts
-	rotate {{ slurm_logrotate_rotate }}
+	rotate {{ slurm.logrotate.rotate }}
 	copytruncate
 	compress
 	create 644 slurm slurm
 	postrotate
-		/bin/kill {{ slurm_logrotate_signal }} $([[ -r {{ slurmctld_pid_file }} ]] && cat {{ slurmctld_pid_file }}) 2>/dev/null 2> /dev/null || true
-		/bin/kill {{ slurm_logrotate_signal }} $(cat /var/run/syslogd.pid) 2> /dev/null 2> /dev/null || true
+		/bin/kill {{ slurm.logrotate.signal }} $([[ -r {{ slurmctld_pid_file }} ]] && cat {{ slurmctld_pid_file }}) 2>/dev/null 2> /dev/null || true
+		/bin/kill {{ slurm.logrotate.signal }} $(cat /var/run/syslogd.pid) 2> /dev/null 2> /dev/null || true
 	endscript
 }
 {{ slurm_log_dir }}/slurm_jobcomp.log {
-	{{ slurm_logrotate_rotate_interval }}
+	{{ slurm.logrotate.interval }}
 	missingok
 	notifempty
 	sharedscripts
-	rotate {{ slurm_logrotate_rotate }}
+	rotate {{ slurm.logrotate.rotate }}
 	copytruncate
 	compress
 	create 644 slurm slurm
 	postrotate
-		/bin/kill {{ slurm_logrotate_signal }} $([[ -r {{ slurmctld_pid_file }} ]] && cat {{ slurmctld_pid_file }}) 2>/dev/null 2> /dev/null || true
+		/bin/kill {{ slurm.logrotate.signal }} $([[ -r {{ slurmctld_pid_file }} ]] && cat {{ slurmctld_pid_file }}) 2>/dev/null 2> /dev/null || true
 	endscript
 }
 {% endif %}
