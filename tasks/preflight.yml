@@ -40,9 +40,9 @@
 
 - name: Clone the Slurm repository to the target
   ansible.builtin.git:
-    repo: "{{ slurm_repo }}"
-    dest: "{{ slurm_src_target_dir }}"
-    version: "{{ slurm_version_tag }}"
+    repo: "{{ slurm_src.repo }}"
+    dest: "{{ slurm_src_dir }}"
+    version: "{{ slurm_src.tag }}"
     accept_hostkey: "{{ accept_gitlab_hostkey }}"
   register: cloned_slurm
 

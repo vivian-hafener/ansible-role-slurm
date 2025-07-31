@@ -10,7 +10,7 @@
 CgroupMountpoint={{ slurm_cgroup_mountpoint }}
 CgroupPlugin=autodetect
 ConstrainCores={{ slurm_cgroup_constrain_cores }}
-{% if slurm_major_version|int < 21 %}
+{% if slurm_src.major_version|int < 21 %}
 TaskAffinity={{ slurm_cgroup_taskaffinity }}
 {% endif %}
 {% if slurm_cgroup_constrain_kmem_space is defined %}
