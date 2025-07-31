@@ -21,7 +21,7 @@
 - name: Configure Slurm
   ansible.builtin.command:
     chdir: "{{ build.dir }}"
-    cmd: "{{ src.dir }}/configure {{ build.flags }}"
+    cmd: "{{ src.dir }}/configure {{ build.flags|join(' ') }}"
   register: configure_slurm
   changed_when: "configure_slurm.rc == 0"
 

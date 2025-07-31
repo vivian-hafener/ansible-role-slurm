@@ -7,7 +7,10 @@ src:
 
 build:
   dir: "{{ src.dir }}/{{ inventory_hostname }}/build"
-  flags: "--enable-developer --sysconfdir={{ slurm_conf_dir }} {{ slurm_jwt_configure_flags }}"
+  flags:
+    - "--enable-developer"
+    - "--sysconfdir={{ slurm_conf_dir }}"
+    - "{{ slurm_jwt_configure_flags }}"
   method: "script"
   script: "/home/vhafener/slurm/scripts/make.py"
   with_tags: false
