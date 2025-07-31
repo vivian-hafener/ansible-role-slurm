@@ -6,7 +6,7 @@
     owner: "{{ slurm_conf_owner }}"
     group: "{{ slurm_conf_group }}"
     mode: "{{ slurm_conf_mode }}"
-    backup: "{{ slurm_backup_conf }}"
+    backup: "{{ slurm_conf_backup }}"
 
 - name: Create slurm/plugstack.conf.d
   ansible.builtin.file:

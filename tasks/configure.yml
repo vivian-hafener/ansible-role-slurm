@@ -64,7 +64,7 @@
     owner: "{{ slurm_conf_owner }}"
     group: "{{ slurm_conf_group }}"
     mode: '0600'
-    backup: "{{ slurm_backup_conf }}"
+    backup: "{{ slurm_conf_backup }}"
   when: slurmdbd_host == inventory_hostname
   notify: Restart slurmdbd
 

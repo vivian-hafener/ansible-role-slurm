@@ -6,7 +6,7 @@
     owner: "{{ owner }}"
     group: "{{ group }}"
     mode: "{{ mode }}"
-    backup: "{{ slurm_backup_conf }}"
+    backup: "{{ slurm_conf_backup }}"
   when: "{{ item.cond }}"
   # TODO Find out idiomatic way to do below
   # register: "{{ item.src }}_placed"

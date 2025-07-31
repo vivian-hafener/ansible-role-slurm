@@ -21,28 +21,15 @@
 - name: Configure Slurm
   ansible.builtin.command:
     chdir: "{{ slurm_build_dir }}"
-    cmd: "{{ slurm_src_dir }}/configure {{ slurm_configure_flags }}"
+    cmd: "{{ slurm_src_dir }}/configure {{ slurm_configure_flags|join(' ') }}"
   register: configure_slurm
   changed_when: "configure_slurm.rc == 0"
 
-- name: Create scripts dir
-  ansible.builtin.file:
-    path: "{{ slurm_scripts_dir }}"
-    state: directory
-    mode: "{{ slurm_dir_mode }}"
-
-- name: Place make script
-  when: place_make_script
-  ansible.builtin.copy:
-    src: "{{ make_script_src }}"
-    dest: "{{ make_script_path }}"
-    mode: "0755"
-
 - name: Install slurm with make.py
-  when: slurm_build_method == "make.py"
+  when: slurm_build_method == "script"
   ansible.builtin.script:
     chdir: "{{ slurm_build_dir }}"
-    cmd: "{{ make_script_path }}"
+    cmd: "{{ build_script_path }}"
 
 # TODO [EXTERNAL] Configure installation with make
 # - name: Install slurm with make
