@@ -34,6 +34,8 @@
     - {src: "slurm_rsyslog.conf", dst: "/etc/rsyslog.d/10_slurm_rsyslog.conf", cond: slurm_with_rsyslog}
     - {src: "cgroup_allowed_devices_file.j2", dst: "{{ slurm_conf_dir }}/cgroup_allowed_devices_file.conf", cond: slurm_with_cgroups, notify: Config change}
     - {src: "slurm_logrotate.j2", dst: "/etc/logrotate.d/slurm", cond: (slurm_log_dir is defined) and slurm_with_logrotate}
+  loop_control:
+    label: "File: {{ item.src }}"
 
 - name: Make Systemd service files from template
   ansible.builtin.include_tasks: template.yml
@@ -47,6 +49,8 @@
     - {src: "slurmdbd.service.j2", dst: "/etc/systemd/system/slurmdbd.service", cond: (slurmctld_host == inventory_hostname), notify: Reload daemon}
     - {src: "slurmrestd.service.j2", dst: "/etc/systemd/system/slurmrestd.service", cond: "(slurmctld_host == inventory_hostname) and slurm_restapi", notify: Reload daemon}
     - {src: "sackd.service.j2", dst: "/etc/systemd/system/sackd.service", cond: slurm_with_sackd, notify: Reload daemon}
+  loop_control:
+    label: "Service: {{ item.src }}"
 
 - name: Template in slurmdbd.conf
   ansible.builtin.template:
@@ -64,37 +68,35 @@
   when: slurm_with_plugstack
 
 # REF: https://slurm.schedmd.com/jwt.html#setup
-- name: Generate JWT Key
-  become: true
-  ansible.builtin.command:
-    cmd: "dd if=/dev/random of={{ jwt_key_path }} bs=32 count=1"
-    creates: "{{ jwt_key_path }}"
+- block:
+  - name: Generate JWT Key
+    become: true
+    ansible.builtin.command:
+      cmd: "dd if=/dev/random of={{ jwt_key_path }} bs=32 count=1"
+      creates: "{{ jwt_key_path }}"
+  - name: Set ownership of JWT key
+    become: true
+    ansible.builtin.file:
+      path: "{{ jwt_key_path }}"
+      owner: "{{ slurm_conf_owner }}"
+      group: "{{ slurm_conf_group }}"
+      mode: '600'
   when: slurm_with_jwt
 
-# REF: https://slurm.schedmd.com/jwt.html#setup
-- name: Set ownership of JWT key
-  become: true
-  ansible.builtin.file:
-    path: "{{ jwt_key_path }}"
-    owner: "{{ slurm_conf_owner }}"
-    group: "{{ slurm_conf_group }}"
-    mode: '600'
-  when: slurm_with_jwt
 
 # REF: https://slurm.schedmd.com/high_throughput.html#sys_config
-- name: Increase net.core.somaxconn for slurmctld
-  ansible.posix.sysctl:
-    name: net.core.somaxconn
-    value: "{{ slurm_sysctl_core_somaxconn }}"
-    sysctl_file: /etc/sysctl.d/50-slurm.conf
-  when: slurm_manage_sysctl
+- block:
+  - name: Increase net.core.somaxconn for slurmctld
+    ansible.posix.sysctl:
+      name: net.core.somaxconn
+      value: "{{ slurm_sysctl_core_somaxconn }}"
+      sysctl_file: /etc/sysctl.d/50-slurm.conf
 
-# REF: https://slurm.schedmd.com/high_throughput.html#sys_config
-- name: Increase net.ipv4.tcp_max_syn_backlog for slurmctld
-  ansible.posix.sysctl:
-    name: net.ipv4.tcp_max_syn_backlog
-    value: "{{ slurm_sysctl_tcp_max_syn_backlog }}"
-    sysctl_file: /etc/sysctl.d/50-slurm.conf
+  - name: Increase net.ipv4.tcp_max_syn_backlog for slurmctld
+    ansible.posix.sysctl:
+      name: net.ipv4.tcp_max_syn_backlog
+      value: "{{ slurm_sysctl_tcp_max_syn_backlog }}"
+      sysctl_file: /etc/sysctl.d/50-slurm.conf
   when: slurm_manage_sysctl
 
 - name: Flush handlers

@@ -10,16 +10,19 @@
     - {name: slurmd.service, state: "{{ slurmd_service_state }}", cond: "(inventory_hostname in groups['slurm_compute']) and (configure_slurmd or build_slurm_auto or reconfigure_slurm)"}
     - {name: sackd.service, state: "{{ sackd_service_state }}", cond: "(slurmctld_host == inventory_hostname) and (configure_slurmd or build_slurm_auto or reconfigure_slurm) and slurm_with_sackd"}
     - {name: slurmrestd.service, state: "{{ slurmrestd_service_state }}", cond: "(slurmctld_host == inventory_hostname) and (configure_slurmd or build_slurm_auto or reconfigure_slurm) and slurm_restapi"}
+  loop_control:
+    label: "Sets state of {{ item.name }} to {{ item.state }}"
 
 # Initial Standup Tasks
-- name: Sacctmgr show cluster siteName and store in slurm_clusterlist variable
-  ansible.builtin.shell: "set -o pipefail && sacctmgr -n show cluster {{ slurm_cluster_name }}  |grep {{ slurm_cluster_name }} | sed -e 's/.* {{ slurm_cluster_name }} .*/FOUND/'"
-  register: slurm_clusterlist
-  check_mode: false
-  changed_when: false
-  when: (slurmdbd_host == inventory_hostname) and (configure_slurm_mariadb or (build_slurm_auto and mariadb_when_autobuild)) and slurm_acct_db_created.created
+- block: 
+  - name: Sacctmgr show cluster siteName and store in slurm_clusterlist variable
+    ansible.builtin.shell: "set -o pipefail && sacctmgr -n show cluster {{ slurm_cluster_name }}  |grep {{ slurm_cluster_name }} | sed -e 's/.* {{ slurm_cluster_name }} .*/FOUND/'"
+    register: slurm_clusterlist
+    check_mode: false
+    changed_when: false
 
-- name: Sacctmgr add cluster to accounting if it is not added already
-  ansible.builtin.command: "sacctmgr -i add cluster {{ slurm_cluster_name }} "
-  when: (slurmdbd_host == inventory_hostname) and (configure_slurm_mariadb or (build_slurm_auto and mariadb_when_autobuild)) and slurm_acct_db_created.created and (slurm_clusterlist.stdout.find("FOUND") == -1)
-  changed_when: true
+  - name: Sacctmgr add cluster to accounting if it is not added already
+    ansible.builtin.command: "sacctmgr -i add cluster {{ slurm_cluster_name }} "
+    when: (slurm_clusterlist.stdout.find("FOUND") == -1)
+    changed_when: true
+  when: (slurmdbd_host == inventory_hostname) and (configure_slurm_mariadb or (build_slurm_auto and mariadb_when_autobuild)) and slurm_acct_db_created.created

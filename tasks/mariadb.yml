@@ -16,43 +16,42 @@
     delay: 5
     timeout: 60
 
-- name: Set root sql user password
-  # If .my.cnf already exists, this will cause an mysql-root-password update.
-  # check_implicit_admin means it tries without password first
-  community.mysql.mysql_user:
-    name: root
-    password: "{{ slurmdb_root_password }}"
-    check_implicit_admin: true
-  when: slurm_manage_mariadb_security and not ansible_check_mode
+- block:
+  - name: Set root sql user password
+    # If .my.cnf already exists, this will cause an mysql-root-password update.
+    # check_implicit_admin means it tries without password first
+    community.mysql.mysql_user:
+      name: root
+      password: "{{ slurmdb_root_password }}"
+      check_implicit_admin: true
+    when: not ansible_check_mode
 
-- name: Template .my.cnf
-  ansible.builtin.template:
-    src: ".my.cnf.j2"
-    dest: "/root/.my.cnf"
-    owner: root
-    group: root
-    mode: '0600'
-  when: slurm_manage_mariadb_security
-  notify: Restart mariadb
+  - name: Template .my.cnf
+    ansible.builtin.template:
+      src: ".my.cnf.j2"
+      dest: "/root/.my.cnf"
+      owner: root
+      group: root
+      mode: '0600'
+    notify: Restart mariadb
 
-- name: Delete anonymous sql server user for localhost
-  community.mysql.mysql_user:
-    user: ""
-    state: absent
+  - name: Delete anonymous sql server user for localhost
+    community.mysql.mysql_user:
+      user: ""
+      state: absent
+
+  - name: Remove the mysql test database
+    community.mysql.mysql_db:
+      db: test
+      state: absent
+
+  - name: Create slurm acct db
+    community.mysql.mysql_db:
+      name: slurm_acct_db
+      state: present
+    register: slurm_acct_db_created
   when: slurm_manage_mariadb_security
 
-- name: Remove the mysql test database
-  community.mysql.mysql_db:
-    db: test
-    state: absent
-  when: slurm_manage_mariadb_security
-
-- name: Create slurm acct db
-  community.mysql.mysql_db:
-    name: slurm_acct_db
-    state: present
-  when: slurm_manage_mariadb_security
-  register: slurm_acct_db_created
 
 - name: Create slurm sql user
   community.mysql.mysql_user:
