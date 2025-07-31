@@ -45,6 +45,7 @@ slurmctld_host: "n1.{{ slurm_cluster_domain }}"
 slurmdbd_host: "n1.{{ slurm_cluster_domain }}"
 
 # Feature toggles
+slurm_restapi: true
 slurm_with_pam: false
 slurm_with_gpu: false
 slurm_with_cgroups: true

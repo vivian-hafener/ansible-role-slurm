@@ -4,7 +4,7 @@ slurm_src:
   repo: "https://github.com/SchedMD/slurm"
   tag: "slurm-25-05-1-1"
   version: "25.05"
-  major_version: "{{ (slurm_src.version.split('.') | map('trim'))[0] }}"
+  major_version: "25"
 
 # Build directories
 slurm_src_dir: "{{ user_homedir }}/slurm/{{ slurm_version }}"

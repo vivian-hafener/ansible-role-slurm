@@ -12,7 +12,7 @@
 - name: Reload daemon
   ansible.builtin.systemd_service:
     daemon_reload: true
-  
+
 - name: Restart slurmctld
   ansible.builtin.systemd_service:
     name: slurmctld
@@ -27,6 +27,14 @@
   ansible.builtin.systemd_service:
     name: slurmdbd
     state: restarted
+
+- name: Config change
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    state: restarted
+  loop:
+    - slurmd
+    - slurmdbd
 
 - name: Scontrol reconfig
   become: true
