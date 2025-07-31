@@ -15,6 +15,9 @@ slurmd_pid_file: "/var/run/slurmd.pid"
 slurm_mpi_default: "none"
 # slurm_mpi_params: ""
 
+# Slurm restd
+slurm_restd_port: 6820
+
 slurm_switch_type: "switch/none"
 slurm_proctrack_type: "proctrack/cgroup" # TODO Make this dymanic on slurm_with_cgroups
 slurm_first_job_id: "1"

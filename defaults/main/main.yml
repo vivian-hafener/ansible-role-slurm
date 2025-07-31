@@ -7,7 +7,6 @@ user_homedir: "/home/vhafener"
 
 build_slurm_auto: true
 slurm_version: "25.05"
-slurm_version_tag: "slurm-25-05-1-1"
 
 reconfigure_slurm: false
 
@@ -61,6 +60,7 @@ slurmctld_service_state: "{{ slurm_services_state }}"
 slurmd_service_state: "{{ slurm_services_state }}"
 slurmdbd_service_state: "{{ slurm_services_state }}"
 sackd_service_state: "{{ slurm_services_state }}"
+slurmrestd_service_state: "{{ slurm_services_state }}"
 
 # JWT
 slurm_with_jwt: true

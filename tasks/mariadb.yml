@@ -9,13 +9,6 @@
     name: mariadb
     state: started
     enabled: true
-  register: mariadb_start
-
-- name: Restart mariadb after install
-  ansible.builtin.systemd_service:
-    name: mariadb
-    state: restarted
-  when: not mariadb_start.changed
 
 - name: Wait for mysql in port 3306 to start
   ansible.builtin.wait_for:
@@ -40,6 +33,7 @@
     group: root
     mode: '0600'
   when: slurm_manage_mariadb_security
+  notify: Restart mariadb
 
 - name: Delete anonymous sql server user for localhost
   community.mysql.mysql_user:
@@ -76,3 +70,6 @@
     state: present
     update_password: always
   when: mysqlslurmuser is failed or mysqlslurmuser is changed
+
+- name: Restart mariadb
+  ansible.builtin.meta: flush_handlers

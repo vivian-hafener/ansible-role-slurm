@@ -12,8 +12,8 @@
   ansible.builtin.command:
     cmd: /usr/sbin/mungekey
     creates: "{{ munge_key_path }}"
-  register: mungekeygen
   when: (not mungekeystat) and (slurmctld_host == inventory_hostname)
+  notify: Restart munge
 
 - name: Copy munge key to compute nodes
   ansible.builtin.copy:
@@ -35,14 +35,11 @@
     group: munge
     mode: '0600'
 
-- name: Restart munge
-  ansible.builtin.systemd_service:
-    name: munge
-    state: restarted
-  when: ((mungekeygen.changed and mungekeygen is defined) and (slurmctld_host == inventory_hostname)) or (mungekeycopy.changed and mungekeycopy is defined)
-
 - name: Start and enable munge
   ansible.builtin.systemd_service:
     name: munge
     state: started
     enabled: true
+
+- name: Restart munge
+  ansible.builtin.meta: flush_handlers

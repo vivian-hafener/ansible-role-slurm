@@ -16,6 +16,7 @@
   ansible.builtin.include_tasks: configure.yml
   when: (configure_slurm or reconfigure_slurm) or build_slurm_auto
 
+# TODO inventory_hostname is unreliable and should be altered to something like ansible_hostname in all cases
 # TASK REF: https://slurm.schedmd.com/accounting.html#mysql-configuration
 - name: Set up Mariadb
   ansible.builtin.include_tasks: mariadb.yml
