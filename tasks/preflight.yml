@@ -11,32 +11,34 @@
   ansible.builtin.set_fact:
     build_slurm_auto: "{{ not slurm_version in slurmd_version.stdout | default('true') }}"
 
-- block:
-  - name: Determine slurmctld version
-    ansible.builtin.command:
-      cmd: slurmctld --version
-    changed_when: true
-    register: slurmctld_version
-    ignore_errors: true
-
-  - name: Set Slurmctld version fact
-    ansible.builtin.set_fact:
-      build_slurm_auto: "{{ not slurm_version in slurmctld_version.stdout | default('true') }}"
+- name: Determine Slurmctld version
   when: slurmctld_host == inventory_hostname
+  block:
+    - name: Determine slurmctld version
+      ansible.builtin.command:
+        cmd: slurmctld --version
+      changed_when: true
+      register: slurmctld_version
+      ignore_errors: true
 
-- block:
-  - name: Determine slurmdbd version
-    become: true
-    ansible.builtin.command:
-      cmd: slurmdbd -V
-    changed_when: true
-    register: slurmdbd_version
-    ignore_errors: true
+    - name: Set Slurmctld version fact
+      ansible.builtin.set_fact:
+        build_slurm_auto: "{{ not slurm_version in slurmctld_version.stdout | default('true') }}"
 
-  - name: Set Slurmdbd version fact
-    ansible.builtin.set_fact:
-      build_slurm_auto: "{{ not slurm_version in slurmdbd_version.stdout | default('true') }}"
+- name: Determine slurmdbd version
   when: slurmdbd_host == inventory_hostname
+  block:
+    - name: Determine slurmdbd version
+      become: true
+      ansible.builtin.command:
+        cmd: slurmdbd -V
+      changed_when: true
+      register: slurmdbd_version
+      ignore_errors: true
+
+    - name: Set Slurmdbd version fact
+      ansible.builtin.set_fact:
+        build_slurm_auto: "{{ not slurm_version in slurmdbd_version.stdout | default('true') }}"
 
 - name: Clone the Slurm repository to the target
   ansible.builtin.git:
@@ -49,4 +51,4 @@
 - name: Set to autobuild on tag move
   ansible.builtin.set_fact:
     build_slurm_auto: true
-  when: cloned_slurm.changed
+  when: cloned_slurm.changed # noqa: no-handler
