@@ -1,35 +1,36 @@
 ---
-- name: Install build dependencies
+- name: Installs Slurm build dependencies
   ansible.builtin.dnf:
     name: "{{ item }}"
     state: present
   loop: "{{ slurm_build_deps }}"
   when: install_build_deps
 
-- name: Install JWT
+- name: Installs JWT
   ansible.builtin.include_tasks: jwt.yml
   when: slurm_with_jwt
 
 # REF: https://slurm.schedmd.com/quickstart_admin.html#manual_build
-- name: Create build dir
+- name: Creates build dir for Slurm
   ansible.builtin.file:
     path: "{{ slurm_build_dir }}"
     state: directory
     owner: "{{ slurm_user }}"
     mode: "{{ slurm_dir_mode }}"
 
-- name: Configure Slurm
+- name: Configures Slurm
   ansible.builtin.command:
     chdir: "{{ slurm_build_dir }}"
-    cmd: "{{ slurm_src_dir }}/configure {{ slurm_configure_flags|join(' ') }}"
+    cmd: "{{ slurm_src_dir }}/configure {{ slurm_configure_flags | join(' ') }}"
   register: configure_slurm
   changed_when: "configure_slurm.rc == 0"
 
-- name: Install slurm with make.py
+- name: Builds and installs Slurm with make.py
   when: slurm_build_method == "script"
   ansible.builtin.script:
     chdir: "{{ slurm_build_dir }}"
     cmd: "{{ build_script_path }}"
+  notify: Config change
 
 # TODO [EXTERNAL] Configure installation with make
 # - name: Install slurm with make

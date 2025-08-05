@@ -3,6 +3,7 @@
   ansible.builtin.systemd_service:
     name: mariadb
     state: restarted
+  when: (slurmdbd_host == inventory_hostname)
 
 - name: Restart munge
   ansible.builtin.systemd_service:
@@ -17,24 +18,21 @@
   ansible.builtin.systemd_service:
     name: slurmctld
     state: restarted
+  listen: Config change
+  when: (slurmctld_host == inventory_hostname)
 
 - name: Restart slurmd
   ansible.builtin.systemd_service:
     name: slurmd
     state: restarted
+  listen: Config change
+  when: (inventory_hostname in groups['slurm_compute'])
 
 - name: Restart slurmdbd
   ansible.builtin.systemd_service:
     name: slurmdbd
     state: restarted
-
-- name: Config change
-  ansible.builtin.systemd_service:
-    name: "{{ item }}"
-    state: restarted
-  loop:
-    - slurmd
-    - slurmdbd
+  when: (slurmdbd_host == inventory_hostname)
 
 - name: Scontrol reconfig
   become: true
@@ -42,3 +40,4 @@
     cmd: scontrol reconfigure
   when: slurmctld_host == inventory_hostname
   changed_when: true
+  listen: Config change
