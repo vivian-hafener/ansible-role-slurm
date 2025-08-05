@@ -13,7 +13,7 @@ User=slurm
 Group=slurm
 RuntimeDirectory=slurmctld
 RuntimeDirectoryMode=0755
-ExecStart={{ slurm_sbin_dir }}/slurmctld -f {{ slurm_conf_dir }}/slurm.conf --systemd $SLURMCTLD_OPTIONS
+ExecStart={{ slurm_sbin_dir }}/slurmctld -f {{ slurm_conf_dir }}/slurm.conf {{ slurmctld_service_extra_flags }} --systemd $SLURMCTLD_OPTIONS
 ExecReload=/bin/kill -HUP $MAINPID
 LimitNOFILE=65536
 

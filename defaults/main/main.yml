@@ -62,6 +62,7 @@ munge_key_path: "/etc/munge/munge.key"
 # Systemd Settings
 slurm_manage_sysctl: false
 slurmctld_service_state: "{{ slurm_services_state }}"
+slurmctld_service_extra_flags: ""
 slurmd_service_state: "{{ slurm_services_state }}"
 slurmdbd_service_state: "{{ slurm_services_state }}"
 sackd_service_state: "{{ slurm_services_state }}"
