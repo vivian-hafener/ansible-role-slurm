@@ -1,49 +1,49 @@
 ---
 # REF: https://slurm.schedmd.com/related_software.html#jwt
-- name: Create JWT directory
+- name: Create build directory for JWT
   ansible.builtin.file:
     path: "{{ jwt_src_target }}"
     state: directory
     mode: '0755'
 
-- name: Clone the repository to the target
+- name: Clone libjwt repository to the target
   ansible.builtin.git:
     repo: "{{ jwt_repo }}"
     dest: "{{ jwt_src_target }}/libjwt"
     version: "{{ jwt_branch }}"
     single_branch: true
-    force: true
   register: jwt_repo_state
 
 # REF: https://github.com/benmcollins/libjwt?tab=readme-ov-file#required
-- name: Install build dependencies
-  ansible.builtin.dnf:
-    name: "{{ item }}"
-    state: present
-  when: install_jwt_build_deps and jwt_repo_state.changed
-  loop:
-    - libjwt
-    - autoconf
-    - automake
-    - libtool
-    - jansson-devel
+- name: Build and install libjwt
+  when: jwt_repo_state.changed # noqa: no-handler
+  block:
+    - name: Install JWT's build dependencies
+      ansible.builtin.dnf:
+        name: "{{ item }}"
+        state: present
+      when: install_jwt_build_deps
+      loop:
+        - libjwt
+        - autoconf
+        - automake
+        - libtool
+        - jansson-devel
 
-- name: Configure JWT
-  become: true
-  ansible.builtin.shell:
-    chdir: "{{ jwt_src_target }}/libjwt"
-    cmd: |
-      set -o pipefail && autoupdate
-      autoreconf --force --install
-      ./configure --prefix="{{ jwt_conf_prefix }}"
-      make -j
-  changed_when: true
-  when: jwt_repo_state.changed
+    - name: Configure JWT for build
+      become: true
+      ansible.builtin.shell:
+        chdir: "{{ jwt_src_target }}/libjwt"
+        cmd: |
+          set -o pipefail && autoupdate
+          autoreconf --force --install
+          ./configure --prefix="{{ jwt_conf_prefix }}"
+          make -j
+      changed_when: true
 
-- name: Install JWT
-  become: true
-  ansible.builtin.command:
-    cmd: make install
-    chdir: "{{ jwt_src_target }}/libjwt"
-  changed_when: true
-  when: jwt_repo_state.changed
+    - name: Install JWT
+      become: true
+      ansible.builtin.command:
+        cmd: make install
+        chdir: "{{ jwt_src_target }}/libjwt"
+      changed_when: true
