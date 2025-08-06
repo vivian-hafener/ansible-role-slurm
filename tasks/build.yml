@@ -25,16 +25,18 @@
   register: configure_slurm
   changed_when: "configure_slurm.rc == 0"
 
-- name: Builds and installs Slurm with make.py
+- name: Builds and installs Slurm with script
   when: slurm_build_method == "script"
   ansible.builtin.script:
     chdir: "{{ slurm_build_dir }}"
     cmd: "{{ build_script_path }}"
   notify: Config change
 
-# TODO [EXTERNAL] Configure installation with make
-# - name: Install slurm with make
-#   when: slurm_built_method == "make"
+- name: Builds and installs Slurm with Make
+  when: slurm_build_method == "make"
+  community.general.make:
+    chdir: "{{ slurm_build_dir }}"
+    target: install
 
 - name: Make tags with ctags
   when: maketags
