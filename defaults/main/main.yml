@@ -18,6 +18,7 @@ install_build_deps: false
 slurm_services_state: "started"
 
 # ============ Configuration ============
+
 # Slurm user and groups
 slurm_user: slurm
 slurm_group: slurm
@@ -55,6 +56,22 @@ slurm_with_topo: false
 slurm_with_rsyslog: false
 slurm_with_logrotate: true
 slurm_with_x11: false
+
+# Install Slurm from repository packages instead of building from source
+install_slurm_pkgs: false
+slurm_packages:
+ - slurm
+ - slurm-contribs
+ - slurm-devel
+ - slurm-pam_slurm
+ - slurm-perlapi
+ - slurm-torque
+ - slurm-libpmi
+ - lua-devel
+ - mailx
+ - slurm-slurmctld
+ - slurm-slurmd
+
 
 # Munge
 munge_key_path: "/etc/munge/munge.key"

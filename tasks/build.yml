@@ -1,6 +1,6 @@
 ---
 - name: Installs Slurm build dependencies
-  ansible.builtin.dnf:
+  ansible.builtin.package:
     name: "{{ item }}"
     state: present
   loop: "{{ slurm_build_deps }}"

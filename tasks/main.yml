@@ -1,7 +1,6 @@
 ---
 - name: Preflight checks to determine tasking
   ansible.builtin.include_tasks: preflight.yml
-  when: build_slurm_auto
 
 - name: Configure slurm user and group
   ansible.builtin.include_tasks: user.yml
@@ -10,7 +9,6 @@
 - name: Build
   ansible.builtin.include_tasks: build.yml
   when: build_slurm or build_slurm_auto
-# TODO [EXTERNAL] - Set up other options for installation
 
 - name: Configure
   ansible.builtin.include_tasks: configure.yml

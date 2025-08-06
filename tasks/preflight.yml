@@ -1,54 +1,63 @@
 ---
-- name: Determine slurmd versions
-  ansible.builtin.command:
-    cmd: slurmd --version
-  when: inventory_hostname in groups['slurm_compute']
-  changed_when: true
-  register: slurmd_version
-  ignore_errors: true
-
-- name: Set Slurmd version fact
-  ansible.builtin.set_fact:
-    build_slurm_auto: "{{ not slurm_version in slurmd_version.stdout | default('true') }}"
-
-- name: Determine Slurmctld version
-  when: slurmctld_host == inventory_hostname
+- name: Preflight tasks for autobuilding Slurm
+  when: build_slurm_auto
   block:
-    - name: Determine slurmctld version
+    - name: Determine slurmd versions
       ansible.builtin.command:
-        cmd: slurmctld --version
+        cmd: slurmd --version
+      when: inventory_hostname in groups['slurm_compute']
       changed_when: true
-      register: slurmctld_version
+      register: slurmd_version
       ignore_errors: true
 
-    - name: Set Slurmctld version fact
+    - name: Set Slurmd version fact
       ansible.builtin.set_fact:
-        build_slurm_auto: "{{ not slurm_version in slurmctld_version.stdout | default('true') }}"
+        build_slurm_auto: "{{ not slurm_version in slurmd_version.stdout | default('true') }}"
 
-- name: Determine slurmdbd version
-  when: slurmdbd_host == inventory_hostname
-  block:
+    - name: Determine Slurmctld version
+      when: slurmctld_host == inventory_hostname
+      block:
+        - name: Determine slurmctld version
+          ansible.builtin.command:
+            cmd: slurmctld --version
+          changed_when: true
+          register: slurmctld_version
+          ignore_errors: true
+
+        - name: Set Slurmctld version fact
+          ansible.builtin.set_fact:
+            build_slurm_auto: "{{ not slurm_version in slurmctld_version.stdout | default('true') }}"
+
     - name: Determine slurmdbd version
-      become: true
-      ansible.builtin.command:
-        cmd: slurmdbd -V
-      changed_when: true
-      register: slurmdbd_version
-      ignore_errors: true
+      when: slurmdbd_host == inventory_hostname
+      block:
+        - name: Determine slurmdbd version
+          become: true
+          ansible.builtin.command:
+            cmd: slurmdbd -V
+          changed_when: true
+          register: slurmdbd_version
+          ignore_errors: true
 
-    - name: Set Slurmdbd version fact
+        - name: Set Slurmdbd version fact
+          ansible.builtin.set_fact:
+            build_slurm_auto: "{{ not slurm_version in slurmdbd_version.stdout | default('true') }}"
+
+    - name: Clone the Slurm repository to the target
+      ansible.builtin.git:
+        repo: "{{ slurm_src.repo }}"
+        dest: "{{ slurm_src_dir }}"
+        version: "{{ slurm_src.tag }}"
+        accept_hostkey: "{{ accept_gitlab_hostkey }}"
+      register: cloned_slurm
+
+    - name: Set to autobuild on tag move
       ansible.builtin.set_fact:
-        build_slurm_auto: "{{ not slurm_version in slurmdbd_version.stdout | default('true') }}"
+        build_slurm_auto: true
+      when: cloned_slurm.changed # noqa: no-handler
 
-- name: Clone the Slurm repository to the target
-  ansible.builtin.git:
-    repo: "{{ slurm_src.repo }}"
-    dest: "{{ slurm_src_dir }}"
-    version: "{{ slurm_src.tag }}"
-    accept_hostkey: "{{ accept_gitlab_hostkey }}"
-  register: cloned_slurm
-
-- name: Set to autobuild on tag move
-  ansible.builtin.set_fact:
-    build_slurm_auto: true
-  when: cloned_slurm.changed # noqa: no-handler
+- name: Install Slurm packages
+  ansible.builtin.package:
+    name: "{{ slurm_packages }}"
+    state: present
+  when: install_slurm_pkgs and not (build_slurm or build_slurm_auto)
