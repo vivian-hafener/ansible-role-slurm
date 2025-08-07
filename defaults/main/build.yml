@@ -6,6 +6,8 @@ slurm_src:
   version: "25.05"
   major_version: "25"
 
+rollback_slurm_on_failure: true
+
 # Build directories
 slurm_src_dir: "{{ user_homedir }}/slurm/{{ slurm_version }}"
 slurm_build_dir: "{{ slurm_src_dir }}/{{ inventory_hostname }}/build"

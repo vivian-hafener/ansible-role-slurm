@@ -12,6 +12,7 @@
     dest: "{{ jwt_src_target }}/libjwt"
     version: "{{ jwt_branch }}"
     single_branch: true
+    force: true  # For the purposes of this role, I consider the upstream JWT repo to be the source of truth. If upstream changes, I should be rebuilding
   register: jwt_repo_state
 
 # REF: https://github.com/benmcollins/libjwt?tab=readme-ov-file#required

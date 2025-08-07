@@ -10,7 +10,6 @@
   ansible.builtin.include_tasks: jwt.yml
   when: slurm_with_jwt
 
-# REF: https://slurm.schedmd.com/quickstart_admin.html#manual_build
 - name: Creates build dir for Slurm
   ansible.builtin.file:
     path: "{{ slurm_build_dir }}"
@@ -18,25 +17,58 @@
     owner: "{{ slurm_user }}"
     mode: "{{ slurm_dir_mode }}"
 
-- name: Configures Slurm
-  ansible.builtin.command:
-    chdir: "{{ slurm_build_dir }}"
-    cmd: "{{ slurm_src_dir }}/configure {{ slurm_configure_flags | join(' ') }}"
-  register: configure_slurm
-  changed_when: "configure_slurm.rc == 0"
+# REF: https://slurm.schedmd.com/quickstart_admin.html#manual_build
+- name: Build and install Slurm from Source
+  block:
+    - name: Configures Slurm
+      ansible.builtin.command:
+        chdir: "{{ slurm_build_dir }}"
+        cmd: "{{ slurm_src_dir }}/configure {{ slurm_configure_flags | join(' ') }}"
+      register: configure_slurm
+      changed_when: "configure_slurm.rc == 0"
 
-- name: Builds and installs Slurm with script
-  when: slurm_build_method == "script"
-  ansible.builtin.script:
-    chdir: "{{ slurm_build_dir }}"
-    cmd: "{{ build_script_path }}"
-  notify: Config change
+    - name: Builds and installs Slurm with script
+      when: slurm_build_method == "script"
+      ansible.builtin.script:
+        chdir: "{{ slurm_build_dir }}"
+        cmd: "{{ build_script_path }}"
+      notify: Config change
 
-- name: Builds and installs Slurm with Make
-  when: slurm_build_method == "make"
-  community.general.make:
-    chdir: "{{ slurm_build_dir }}"
-    target: install
+    - name: Builds and installs Slurm with Make
+      when: slurm_build_method == "make"
+      community.general.make:
+        chdir: "{{ slurm_build_dir }}"
+        target: install
+  rescue:
+    - name: Gracefully rollback to the previous version of Slurm
+      when: rollback_slurm_on_failure
+      block:
+        - name: Clones the previous version of the Slurm repository to the target
+          ansible.builtin.git:
+            repo: "{{ slurm_src.repo }}"
+            dest: "{{ slurm_src_dir }}"
+            version: "{{ previous_slurm_state }}"
+            accept_hostkey: "{{ accept_gitlab_hostkey }}"
+
+        - name: Configures Slurm
+          ansible.builtin.command:
+            chdir: "{{ slurm_build_dir }}"
+            cmd: "{{ slurm_src_dir }}/configure {{ slurm_configure_flags | join(' ') }}"
+          register: configure_slurm
+          changed_when: "configure_slurm.rc == 0"
+
+        - name: Builds and installs Slurm with script
+          when: slurm_build_method == "script"
+          ansible.builtin.script:
+            chdir: "{{ slurm_build_dir }}"
+            cmd: "{{ build_script_path }}"
+          notify: Config change
+
+        - name: Builds and installs Slurm with Make
+          when: slurm_build_method == "make"
+          community.general.make:
+            chdir: "{{ slurm_build_dir }}"
+            target: install
 
 - name: Make tags with ctags
   when: maketags

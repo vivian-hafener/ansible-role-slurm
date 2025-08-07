@@ -9,6 +9,7 @@
     mode: "{{ slurm_conf_mode }}"
 
 - name: Create log, state, and conf directories for Slurm
+  when: build_slurm_auto
   ansible.builtin.file:
     path: "{{ item.path }}"
     state: directory
